@@ -2,7 +2,13 @@
 
 Vagrant Plugin allows for a better ansible flow also generates ansible inventory files, and runs playbooks
 
+
 ## Installation
+
+`vagrant plugin install vagrant-flow`
+
+
+Below is how to install as a regular gem which won't work
 
 Add this line to your application's Gemfile:
 
@@ -18,7 +24,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+`vagrant ansible-inventory`
 
 ## Contributing
 
