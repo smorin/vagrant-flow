@@ -35,6 +35,14 @@ Or install it yourself as:
 5. Create new Pull Request
 
 
+## Development
+
+```
+rake build                 # It's a helper that will build your gem
+rake install               # It's a helper that will build and install locally
+rake release               # It's a helper that will push/release to rubygems
+```
+
 # Background Research
 
 Vagrant Plugin List
