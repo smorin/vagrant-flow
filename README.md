@@ -35,6 +35,38 @@ Or install it yourself as:
 5. Create new Pull Request
 
 
+## Development Flow
+
+```
+# cd to vagrant-flow
+
+# build the plugin
+
+rake build
+
+# install the plugin locally
+
+vagrant plugin install pkg/vagrant-flow-1.0.3.gem
+
+#
+# use it and test
+#
+
+vagrant plugin uninstall vagrant-flow
+
+
+#
+# when done testing and ready to publish
+#
+
+rake release
+
+
+# install for real from the repo
+
+vagrant plugin vagrant-flow
+```
+
 # Background Research
 
 Vagrant Plugin List

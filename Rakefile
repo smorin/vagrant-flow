@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'bundler'
-# require 'bundler/setup'    # Was in the example
+require 'bundler/setup'    # Was in the example
 require 'bundler/gem_tasks'  # Was in the template version
 
 # Immediately sync all stdout so that tools like buildbot can
