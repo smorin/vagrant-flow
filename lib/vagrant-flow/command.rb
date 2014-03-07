@@ -92,7 +92,7 @@ module VagrantPlugins
         #outputs is going to contain our strings that are the formatted ansible configs
         #the key will be the vm name, the value will the be formatted sring
         outputs = {}
-        require 'pp'
+        
         inventory_configs[:vagrant_flow_file].open('w') do |file|
           machines_configs.each do |host, variables|
             ansible_template = '<%= host_key %> ansible_ssh_host=<%= ssh_host %> ansible_ssh_port=<%= ssh_port %> ansible_ssh_user=<%= ssh_user %> ansible_ssh_private_key_file=<%= private_key_path[0] %> # Machine Name: <%= host_key %>'
@@ -102,6 +102,7 @@ module VagrantPlugins
           end
         end
         
+        #require 'pp'
         #puts "PROVISIONERS"
         #PP.pp(provisioners)
         #puts "OUTPUTS"
