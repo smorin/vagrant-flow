@@ -77,6 +77,7 @@ module VagrantPlugins
             :forward_agent => ssh_info[:forward_agent],
             :forward_x11   => ssh_info[:forward_x11]
           }
+          # Outputs to the stdout
           
           #The provisioning information from teh vagrant file, this will contain our defined ansible groups
           provisioners = machine.config.vm.provisioners
@@ -89,6 +90,16 @@ module VagrantPlugins
           machines_configs[variables[:host_key]]= variables
         end
         
+        
+        # Outputs to the stdout
+        # @env.ui.info(machine.name)
+        
+        # From - Vagrant::Util::SafePuts
+        # Template is erb
+        
+        # Implementation picks the first key
+        # ssh_info[:private_key_path] returns an array
+ 
         #outputs is going to contain our strings that are the formatted ansible configs
         #the key will be the vm name, the value will the be formatted sring
         outputs = {}
@@ -139,6 +150,9 @@ module VagrantPlugins
         0
       end # End Execute
       
+      
+      # Documentation reference
+      # http://docs.ansible.com/intro_inventory.html
       
       def setup_inventory_file(machine)
         return machine.config.inventory_path if machine.config.inventory_path
