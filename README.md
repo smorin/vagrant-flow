@@ -1,6 +1,6 @@
 # Vagrant-Flow
 
-Vagrant Plugin allows for a better ansible flow also generates ansible inventory files, and runs playbooks
+Vagrant Plugin allows for a better ansible flow. It generates ansible inventory files to easily prepare to run ansible playbooks
 
 
 ## Installation
@@ -23,8 +23,53 @@ Or install it yourself as:
     $ gem install vagrant-flow
 
 ## Usage
+```
+#Bring up your vagrant machines
+vagrant up
+#Run ansible inventory
+vagrant ansible-inventory
+#point ansible-playbook to the generated vagrant-flow_ansible_inventory, and point them to whatever playbook you'd like
+ansible-playbook -i path/to/vagrant-flow_ansible_inventory my_playbook.yml
+```
+## Usage Expectations
 
-`vagrant ansible-inventory`
+This plugin expects your vagrantfile to contain a configuration to define groups for all your VMs.  
+
+Example VAGRANTFILE excerpt:
+```
+config.vm.provision "ansible" do |ansible|
+    #ansible.playbook is required, but emptyplaybook.yml can do nothing, 
+    #this way we bypass vagrant's embedded ansible plugin
+    ansible.playbook="emptyplaybook.yml"
+    ansible.groups = {
+      "testgroup" => ["testbox"],
+      "servergroup" => ["server1", "server2"],
+      "common:children" => ["testgroup","servergroup"] #Common things on per-group basis
+    }
+  end
+```
+
+Example playbook.yml:
+```
+---
+  #Configures the groups defined in common:children
+- hosts: common
+  remote_user: root
+  roles:
+    - common
+
+  #Configures all machines in the group "testgroup"
+- hosts: testgroup
+  remote_user: root
+  roles:
+    - jenkins
+ 
+  #Configures specific machine server1
+- hosts: server1
+  roles:
+    - apache
+```
+
 
 ## Contributing
 
