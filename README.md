@@ -86,6 +86,37 @@ testgroup
 servergroup
 ```
 
+## Future Usage and Specs
+Looking for vagrant-flow to have the following commands:
+
+```
+init-flow
+ansible-inventory
+hostfile-local
+hostfile-remote
+flow
+```
+- init-flow -> creates a stub Vagrant file but takes more options
+- ansible-inventory -> creates a ansible-inventory file from the virtualmachines that are there
+- hostfile-local -> create a hostfile that can be appended to your /etc/hosts locally so you can reference the vm's
+- hostfile-remote -> updates the /etc/hosts on all the vm's created by vagrant so they can talk to each other
+- flow -> calls ansible-inventory and hostfile-remote in 1 command.
+
+Example flow to be enabled
+```
+vagrant plugin install vagrant-flow
+git clone http://github.com/DemandCube/DeveloperPlaybooks
+mkdir devsetup
+cd devsetup
+vagrant init-flow frontend1 frontend2:ubuntu-12
+vagrant flow
+ansible-playbook -i ansible-flow_inventoryfile ../DeveloperPlaybooks/site.yml
+
+#communication test
+vagrant ssh frontend1 ping frontend2
+vagrant ssh frontend2 ping frontend1
+```
+
 ## Contributing
 
 1. Fork it ( http://github.com/DemandCube/vagrant-flow/fork )
