@@ -1,5 +1,6 @@
 require 'optparse'
 require "vagrant"
+require "yaml"
 
 module VagrantPlugins
   module VagrantFlow
@@ -19,28 +20,37 @@ module VagrantPlugins
         machines_configs = {}
         inventory_configs = {}
         
+        default_group_config_file = "groupconfig.yml"
         options = {}
         options[:destroy_on_error] = true
         options[:parallel] = false
         options[:provision_ignore_sentinel] = false
-
+        options[:quiet] = false
+        
+        #Setting to read in a file other than default_group_config_File
+        options[:custom_config_file] = false
+        #Setting to parse the VAGRANTFILE's ansible group config
+        options[:vagrantFileAnsibleConfig] = false
+        
+        #Parse option, look up OptionParser documentation 
         opts = OptionParser.new do |o|
           # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
-          o.banner = "Usage: vagrant ansible-inventory [-h]"
+          o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
+                      "Usage: vagrant ansible-inventory [-hgpq]\nThis looks for groupconfig.yml as the default configuration\n"+
+                      "Do not use -p and -g options together!"
           o.separator ""
-
-          # Don't use either of these, just keeping them here as examples of what options are possible 
-          #o.on("--provision-with x,y,z", Array,
-          #        "Enable only certain provisioners, by type.") do |list|
-          #  options[:provision_types] = list.map { |type| type.to_sym }
-          #end
+          o.on("-g", "--group_config_file FILEPATH", "(Optional) YAML file containing group config") do |f|
+            options[:custom_config_file] = f        
+          end
           
-          # This option isn't used.
-          #o.on("--[no-]parallel",
-          #     "Enable or disable parallelism if provider supports it.") do |parallel|
-          #  options[:parallel] = parallel
-          #end
-
+          o.on("-p", "--vagrantfileparse", "(Optional) Read in the VAGRANTFILE's ansible group config") do |f|
+            options[:vagrantFileAnsibleConfig] = true
+          end
+          
+          o.on("-q", "--quiet", "(Optional) Suppress output to STDOUT and STDERR") do |f|
+            options[:quiet] = true
+          end
+          
         end
 
         # Parse the options # Builtin from the Command Class
@@ -48,6 +58,8 @@ module VagrantPlugins
         # Automatically detects -h for help
         argv = parse_options(opts)
         return if !argv
+        
+        
 
         # The following are already setup by the parent class
         # @env
@@ -56,10 +68,11 @@ module VagrantPlugins
 
         # Go over each VM and bring it up
         @logger.debug("'ansible-inventory' created for the whole env")
-
         
+        #Initialize group_machines, the has containing group=>machinename configs
+        group_machines={}
         
-        provisioners = {}
+        #Get info about the vagrant boxes
         with_target_vms(argv, :provider => options[:provider]) do |machine|
           # @env.ui
           # output methods: :ask, :detail, :warn, :error, :info, :output, :success
@@ -79,9 +92,6 @@ module VagrantPlugins
           }
           # Outputs to the stdout
           
-          #The provisioning information from teh vagrant file, this will contain our defined ansible groups
-          provisioners = machine.config.vm.provisioners
-          
           inventory_configs = {
             :vagrant_file_dir => machine.env.root_path,
             :vagrant_flow_file => machine.env.root_path.join("vagrant-flow_ansible_inventory")
@@ -89,6 +99,43 @@ module VagrantPlugins
           
           machines_configs[variables[:host_key]]= variables
         end
+        
+        #Hash containing group/machine configuration
+        group_machines={}
+        #Determine group_machines based on what config options are passed in
+        #Read in config from vagrantfile's ansible config
+        if options[:vagrantFileAnsibleConfig] == true
+          provisioners = []
+          with_target_vms(argv, :provider => options[:provider]) do |machine|
+            #The provisioning information from teh vagrant file, this will contain our defined ansible groups
+            #Concatenate all the provisioner configs together
+            if machine.config.vm.provisioners
+              provisioners.concat(machine.config.vm.provisioners)
+            end
+          end
+          #Since Vagrant machines will likely contain the same configs,
+          #Merge the config together to remove duplicate entries in our
+          #group/machine configuration
+          provisioners.each {|prov|
+            group_machines = group_machines.merge(prov.config.groups)
+          }
+        #Read in config from yaml file
+        else
+          #Use config option if specified
+          if options[:custom_config_file] != false
+              default_group_config_file = options[:custom_config_file]
+          end
+          begin
+            #Load YAML
+            group_machines = YAML.load_file(default_group_config_file)
+          rescue
+            #Give warning if no file could be found
+            if not options[:quiet]
+              warn "Could not open file: "+default_group_config_file.to_s
+            end
+          end
+        end
+        
         
         
         # Outputs to the stdout
@@ -120,33 +167,43 @@ module VagrantPlugins
         #PP.pp(outputs)
         #puts "\n\n"
         
+        
+        
         inventory_configs[:vagrant_flow_file].open('w') do |file|
           header_txt="# Generated by vagrant-flow, part of NeverwinterDP\n\n"
-          safe_puts(header_txt)
+          if not options[:quiet]
+            safe_puts(header_txt)
+          end
           file.write(header_txt)
           
           #Now we maps from our VAGRANTFILE defined groups in our provisioners.config.groups
           #To our configuration strings we got from outputs
-          provisioners.each do |prov|
-            prov.config.groups.each do |groupname,machines|
+          group_machines.each do |groupname,machines|
+            if not options[:quiet]
               puts "["+groupname+"]\n"
-              file.write "["+groupname+"]\n"
-              machines.each do |machinename|
-                #if we match :children, then we have an ansible config that's
-                #pointing to another group, not a specific machine
-                if /:children/.match(groupname)
+            end
+            file.write "["+groupname+"]\n"
+            machines.each do |machinename|
+              #if we match :children, then we have an ansible config that's
+              #pointing to another group, not a specific machine
+              if /:children/.match(groupname)
+                if not options[:quiet]
                   puts machinename
-                  file.write machinename+"\n"
-                else
-                  puts outputs[machinename.to_sym]+"\n"
-                  file.write outputs[machinename.to_sym]+"\n"
                 end
+                file.write machinename+"\n"
+              else
+                if not options[:quiet]
+                  puts outputs[machinename.to_sym]+"\n"
+                end
+                file.write outputs[machinename.to_sym]+"\n"
               end
+            end
+            if not options[:quiet]
               puts "\n"
-              file.write "\n"
-            end    
-          end          
-        end
+            end
+            file.write "\n"
+          end    
+        end          
         0
       end # End Execute
       

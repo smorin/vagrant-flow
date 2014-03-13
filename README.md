@@ -24,18 +24,66 @@ Or install it yourself as:
 
 ## Usage
 ```
+Usage: vagrant ansible-inventory [-hgpq]
+This plugin looks for groupconfig.yml as the default configuration
+Do not use -p and -g options together!
+
+    -g, --group_config_file FILEPATH (Optional) YAML file containing group config
+    -p, --vagrantfileparse           (Optional) Read in the VAGRANTFILE's ansible group config
+    -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
+    -h, --help                       (Optional) Print this help
+```
+
+## Example usages
+This will look for a file in the pwd named groupconfig.yml and attempt to make the inventory
+```
+vagrant ansible-inventory
+```
+
+
+
+This will look for a file in the pwd named myOwnGroupConfig.yml and attempt to make the inventory
+```
+vagrant ansible-inventory -g myOwnGroupConfig.yml
+```
+
+
+
+This will parse the vagrant file for ansible group configs
+```
+vagrant ansible-inventory -p
+```
+
+
+
+
+
+## Use case
+```
 #Bring up your vagrant machines
 vagrant up
-#Run ansible inventory
+#Run ansible inventory (this assumes the file groupconfig.yml exists)
 vagrant ansible-inventory
 #point ansible-playbook to the generated vagrant-flow_ansible_inventory, and point them to whatever playbook you'd like
 ansible-playbook -i path/to/vagrant-flow_ansible_inventory my_playbook.yml
 ```
 ## Usage Expectations
+#### Don't mix the -p and -g options.  Unexpected things will happen.
 
-This plugin expects your vagrantfile to contain a configuration to define groups for all your VMs.  
+Example groupconfig.yml file (for use with no optional command line arguments or  by pointing to non-default file with -g option)
+```
+---
+common:children:
+- testgroup
+- servergroup
+testgroup:
+- testbox
+servergroup:
+- server1
+- server2
+```
 
-Example VAGRANTFILE excerpt:
+Example VAGRANTFILE excerpt (for use with -p option):
 ```
 config.vm.provision "ansible" do |ansible|
     #ansible.playbook is required, but emptyplaybook.yml can do nothing, 
@@ -49,7 +97,7 @@ config.vm.provision "ansible" do |ansible|
   end
 ```
 
-Example playbook.yml:
+Example playbook.yml to use after ansible-inventory has run with command `ansible-playbook -i vagrant-flow_ansible_inventory playbook.yml`:
 ```
 ---
   #Configures the groups defined in common:children
