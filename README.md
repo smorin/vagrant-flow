@@ -23,10 +23,38 @@ Or install it yourself as:
     $ gem install vagrant-flow
 
 ## Usage
+Usage: vagrant ansible-inventory [-hgpq]
+This looks for groupconfig.yml as the default configuration
+
+    -g, --group_config_file FILEPATH (Optional) YAML file containing group config
+    -p, --vagrantfileparse           (Optional) Read in the VAGRANTFILE's ansible group config
+    -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
+    -h, --help                       (Optional) Print this help
+
+## Example usages
+```
+vagrant ansible-inventory
+```
+This will look for a file in the pwd named groupconfig.yml and attempt to make the inventory
+
+
+```
+vagrant ansible-inventory -g myOwnGroupConfig.yml
+```
+This will look for a file in the pwd named myOwnGroupConfig.yml and attempt to make the inventory
+
+
+```
+vagrant ansible-inventory -p
+```
+This will parse the vagrant file for ansible group configs
+
+
+## Use case
 ```
 #Bring up your vagrant machines
 vagrant up
-#Run ansible inventory
+#Run ansible inventory (this assumes the file groupconfig.yml exists)
 vagrant ansible-inventory
 #point ansible-playbook to the generated vagrant-flow_ansible_inventory, and point them to whatever playbook you'd like
 ansible-playbook -i path/to/vagrant-flow_ansible_inventory my_playbook.yml
