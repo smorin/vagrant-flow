@@ -1,5 +1,7 @@
+require "vagrant"
+
 module VagrantPlugins
-  module VagrantFlowCommand
+  module CommandVagrantFlow
     class Plugin < Vagrant.plugin(2)
 
       name 'vagrant-flow'

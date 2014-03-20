@@ -1,11 +1,11 @@
 require 'optparse'
 
 module VagrantPlugins
-  module CommandPlugin
+  module CommandVagrantFlow
     module Command
       class Root < Vagrant.plugin("2", :command)
         def self.synopsis
-          "manages plugins: install, uninstall, update, etc."
+          "manages vagrantflow"
         end
 
         def initialize(argv, env)
@@ -17,6 +17,11 @@ module VagrantPlugins
           @subcommands.register(:ansibleinventory) do
             require_relative "ansibleinventory"
             AnsibleInventory
+          end
+          
+          @subcommands.register(:cloudbox) do
+            require_relative "cloudbox"
+            CloudBox
           end
 
         end
@@ -40,9 +45,9 @@ module VagrantPlugins
         # Prints the help out for this command
         def help
           opts = OptionParser.new do |o|
-            o.banner = "Usage: vagrant plugin <command> [<args>]"
+            o.banner = "Usage: vagrant flow <command> [<args>]"
             o.separator ""
-            o.separator "Available subcommands:"
+            o.separator "Available subcommands: ansibleinventory,"
 
             # Add the available subcommands as separators in order to print them
             # out as well.
@@ -54,7 +59,7 @@ module VagrantPlugins
             end
 
             o.separator ""
-            o.separator "For help on any individual command run `vagrant plugin COMMAND -h`"
+            o.separator "For help on any individual command run `vagrant flow COMMAND -h`"
           end
 
           @env.ui.info(opts.help, :prefix => false)
