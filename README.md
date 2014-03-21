@@ -22,9 +22,12 @@ Or install it yourself as:
 
     $ gem install vagrant-flow
 
-## Usage
+* * *
+
+# Usage
+## ansibleinventory
 ```
-Usage: vagrant ansible-inventory [-hgpq]
+Usage: vagrant flow ansibleinventory [-hgpq]
 This plugin looks for groupconfig.yml as the default configuration
 Do not use -p and -g options together!
 
@@ -34,41 +37,39 @@ Do not use -p and -g options together!
     -h, --help                       (Optional) Print this help
 ```
 
-## Example usages
+#### Example usages of ansibleinventory
 This will look for a file in the pwd named groupconfig.yml and attempt to make the inventory
 ```
-vagrant ansible-inventory
+vagrant flow ansibleinventory
 ```
 
 
 
 This will look for a file in the pwd named myOwnGroupConfig.yml and attempt to make the inventory
 ```
-vagrant ansible-inventory -g myOwnGroupConfig.yml
+vagrant flow ansibleinventory -g myOwnGroupConfig.yml
 ```
 
 
 
 This will parse the vagrant file for ansible group configs
 ```
-vagrant ansible-inventory -p
+vagrant flow ansibleinventory -p
 ```
 
 
 
 
 
-## Use case
+### Use case
 ```
 #Bring up your vagrant machines
 vagrant up
 #Run ansible inventory (this assumes the file groupconfig.yml exists)
-vagrant ansible-inventory
+vagrant flow ansibleinventory
 #point ansible-playbook to the generated vagrant-flow_ansible_inventory, and point them to whatever playbook you'd like
 ansible-playbook -i path/to/vagrant-flow_ansible_inventory my_playbook.yml
 ```
-## Usage Expectations
-#### Don't mix the -p and -g options.  Unexpected things will happen.
 
 Example groupconfig.yml file (for use with no optional command line arguments or  by pointing to non-default file with -g option)
 ```
@@ -117,7 +118,66 @@ Example playbook.yml to use after ansible-inventory has run with command `ansibl
   roles:
     - apache
 ```
+* * *
+## multiinit
+```
+Usage: vagrant flow multiinit [-hgliq]
+This looks for multiinit.yml as the default configuration
 
+    -g FILEPATH,                     (Optional) YAML file containing vagrant cloud config
+        --vagrant_multiinit_config_file
+    -l hostname:cloud/location,hostname2:cloud/location2,hostname3:cloud/location3,
+        --list                       List of cloud config parameters
+    -i, --vboxintnet NAME            (Optional) Custom virtualbox__intnet name for private network
+    -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
+    -h, --help                       Print this help
+```
+
+#### Example usages of multiinit
+This will look for a file in the pwd named multiinit.yml and attempt to make the Vagrantfile
+```
+vagrant flow multiinit
+```
+
+
+
+This will look for a file in the pwd named myOwnGroupConfig.yml and attempt to make the inventory
+```
+vagrant flow multiinit -g myOwnMultiInitConfig.yml
+```
+
+
+
+This will read in from the command line a list of [vm_name]:[url] combinations.  It MUST follow the following format.  The -i option will also set the virtualbox__intnet name to a custom option ("virtualboxprivatenet" in this case)
+```
+vagrant flow multiinit -l boxname1:demandcube/centos-65_x86_64-VB-4.3.8,boxname2:demandcube/centos-65_x86_65-VB-4.3.8,box3:provider/boxname -i virtualboxprivatenet
+```
+
+
+### Use case
+```
+#Create your multi-box Vagrantfile
+vagrant flow multiinit
+#Launch the boxes
+vagrant up
+```
+
+Example multiinitconfig.yml file (for use with no optional command line arguments or by pointing to non-default file with -g option).  The format of this yaml file MUST be followed, but can easily be expanded to include more of fewer machines
+```
+---
+:intnetName: neverwinterDP
+machines:
+- name: machine1
+  url: demandcube/centos-65_x86_64-VB-4.3.8
+- name: server1
+  url: demandcube/centos-64_x86_64-VB-4.3.8
+- name: jenkinstestmachine
+  url: demandcube/centos-65_x86_64-VB-4.3.8
+
+```
+
+
+* * *
 
 Example output (file will be called vagrant-flow_ansible_inventory)
 ```
@@ -203,12 +263,7 @@ rake release
 
 # install for real from the repo
 
-vagrant plugin vagrant-flow
-#This will produce an inventory file named ./vagrant-flow_ansible_inventory
-#Point ansbile-playbook to that inventory file with the -i option and you're good to go
-
-ansible-playbook -i path/to/vagrant-flow_ansible_inventory playbook.yml
-
+vagrant plugin install vagrant-flow
 ```
 
 # Background Research

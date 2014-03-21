@@ -1,5 +1,7 @@
+require "vagrant"
+
 module VagrantPlugins
-  module VagrantFlow
+  module CommandVagrantFlow
     class Plugin < Vagrant.plugin(2)
 
       name 'vagrant-flow'
@@ -10,11 +12,17 @@ module VagrantPlugins
       #   Config
       # end
 
-      command("ansible-inventory") do
-        require_relative 'command'
-        Command
+      #command("ansible-inventory") do
+      #  require_relative 'command'
+      #  Command
+      #end
+      
+      
+      command("flow") do
+        require File.expand_path("../command/root.rb", __FILE__)
+        Command::Root
       end
-
+      
     end # Plugin
   end # Exec
 end # VagrantPlugins

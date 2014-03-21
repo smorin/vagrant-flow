@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  
+  Vagrant.require_version ">= 1.4.3"
+
+  
+
+<% for machine in @machines %>
+
+  config.vm.define :<%= machine["name"]%> do | <%= machine["name"]%> |
+    <%= machine["name"]%>.vm.box = "<%= machine["url"]%>"
+    
+    # Create a private network
+    <%= machine["name"]%>.vm.network :private_network, ip: "<%= machine["ip"]%>", virtualbox__intnet: "<%= @intnetName %>"
+    <%= machine["name"]%>.vm.hostname = "<%= machine["name"]%>"
+    
+    config.vm.provider :virtualbox do |vb|
+      vb.name = "<%= machine["name"]%>"
+      # vb.customize ["modifyvm", :id, "--memory", "1024"]
+      # vb.customize ["modifyvm", :id, "--cpus", "2"]
+    end
+  end
+<% end %>
+end
