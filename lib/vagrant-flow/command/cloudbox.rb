@@ -2,6 +2,7 @@ require "vagrant"
 require 'optparse'
 require "yaml"
 require 'erubis'
+require "ipaddr"
 
 module VagrantPlugins
   module CommandVagrantFlow
@@ -35,7 +36,7 @@ module VagrantPlugins
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow cloudbox [-hgpq]\nThis looks for groupconfig.yml as the default configuration\n"
+                        "Usage: vagrant flow cloudbox [-hgliq]\nThis looks for vagrantcloudconfig.yml as the default configuration\n"
             o.separator ""
             o.on("-g", "--vagrant_cloud_config_file FILEPATH", "(Optional) YAML file containing vagrant cloud config") do |f|
               options[:vagrant_cloud_config_file] = f        
@@ -45,7 +46,7 @@ module VagrantPlugins
               options[:vagrant_cloud_list] = f
             end
             
-            o.on("-i", "--vboxintnet", "(Optional) Custom virtualbox__intnet name for private network") do |f|
+            o.on("-i", "--vboxintnet NAME", "(Optional) Custom virtualbox__intnet name for private network") do |f|
               options[:vboxintnet] = f
             end
             
@@ -80,6 +81,12 @@ module VagrantPlugins
                 warn "Could not open file: "+options[:vagrant_cloud_config_file].to_s
               end
             end
+            
+            #Set intnetName if its not in the config
+            if not content.has_key?(:intnetName)
+              content[:intnetName]=options[:vboxintnet]
+            end
+            
           end
           
           #Read in command line config
@@ -93,21 +100,41 @@ module VagrantPlugins
                               })
             }
             content = {
-              "intnetName"=>options[:vboxintnet],
+              :intnetName=>options[:vboxintnet],
               "machines" => machines,
             }
           end
           
+          #Set IP's for private network
+          #Start at 192.168.1.0 and increment up
+          #using the IPAddr class
+          ip= IPAddr.new("192.168.1.0")
+          content["machines"].each {|machine|
+            ip = IPAddr.new(ip.to_s).succ
+            
+            #If IP ends in x.x.x.0 or x.x.x.1, keep going one more
+            #to avoid conflicts with routers/gateways/etc
+            if ip.to_s.split(//).last(2) == [".","0"]
+              ip = IPAddr.new(ip.to_s).succ
+            end
+            if ip.to_s.split(//).last(2) == [".","1"]
+              ip = IPAddr.new(ip.to_s).succ
+            end
+            machine["ip"] =   ip.to_s
+          }
+          
+          
           #Put Vagrantfile in pwd
           save_path = Pathname.new("Vagrantfile").expand_path(@env.cwd)
-          puts save_path
+          
+          #Error out if Vagrantfile already exists
           raise Vagrant::Errors::VagrantfileExistsError if save_path.exist?
           
+          #Get current directory, go up one directory, then append path to templates/cloudbox.erb
           template_path = File.join(File.expand_path("..",File.dirname(__FILE__)) , ("templates/cloudbox.erb"))
-          puts template_path
+          
+          #Load template file and write contents
           eruby = Erubis::Eruby.new(File.read(template_path))
-          
-          
           begin
             save_path.open("w+") do |f|
               f.write(eruby.evaluate(content))
@@ -115,74 +142,6 @@ module VagrantPlugins
           rescue Errno::EACCES
             raise Vagrant::Errors::VagrantfileWriteError
           end
-        
-          
-          
-=begin
-require 'optparse'
-
-require 'vagrant/util/template_renderer'
-
-module VagrantPlugins
-  module CommandInit
-    class Command < Vagrant.plugin("2", :command)
-      def self.synopsis
-        "initializes a new Vagrant environment by creating a Vagrantfile"
-      end
-
-      def execute
-        options = { output: "Vagrantfile" }
-
-        opts = OptionParser.new do |o|
-          o.banner = "Usage: vagrant init [name] [url]"
-          o.separator ""
-          o.separator "Options:"
-          o.separator ""
-
-          o.on("--output FILE", String,
-               "Output path for the box. '-' for stdout") do |output|
-            options[:output] = output
-          end
-        end
-
-        # Parse the options
-        argv = parse_options(opts)
-        return if !argv
-
-        save_path = nil
-        if options[:output] != "-"
-          save_path = Pathname.new(options[:output]).expand_path(@env.cwd)
-          raise Vagrant::Errors::VagrantfileExistsError if save_path.exist?
-        end
-
-        template_path = ::Vagrant.source_root.join("templates/commands/init/Vagrantfile")
-        contents = Vagrant::Util::TemplateRenderer.render(template_path,
-                                                          :box_name => argv[0] || "base",
-                                                          :box_url => argv[1])
-
-        if save_path
-          # Write out the contents
-          begin
-            save_path.open("w+") do |f|
-              f.write(contents)
-            end
-          rescue Errno::EACCES
-            raise Vagrant::Errors::VagrantfileWriteError
-          end
-
-          @env.ui.info(I18n.t("vagrant.commands.init.success"), prefix: false)
-        else
-          @env.ui.info(contents, prefix: false)
-        end
-
-        # Success, exit status 0
-        0
-      end
-    end
-  end
-end
-
-=end
           
         end
       end       

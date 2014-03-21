@@ -4,11 +4,11 @@ require 'yaml'
 
 ###This shows how to make a valid configuration file in YAML format for vagrant-flow to consume with the ansible-inventory command
 x = {
-  "intnetName"=>"neverwinterDP",
+  :intnetName=>"neverwinterDP",
   "machines" => [
-   {"name"=>"sparkngn1", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8"},
-   {"name"=>"sparkngn2", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8"},
-   {"name"=>"jenkins", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8"},
+   {"name"=>"sparkngin1", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8"},
+   {"name"=>"sparkngin2", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8"},
+   {"name"=>"jenkinsdp", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8"},
   ]
 }
 
@@ -28,4 +28,3 @@ y.each {|key,value|
   puts value
   puts "\n"
 }
-]
