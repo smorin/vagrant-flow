@@ -37,7 +37,7 @@ module VagrantPlugins
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant ansible-inventory [-hgpq]\nThis looks for groupconfig.yml as the default configuration\n"+
+                        "Usage: vagrant flow ansibleinventory [-hgpq]\nThis looks for groupconfig.yml as the default configuration\n"+
                         "Do not use -p and -g options together!"
             o.separator ""
             o.on("-g", "--group_config_file FILEPATH", "(Optional) YAML file containing group config") do |f|
