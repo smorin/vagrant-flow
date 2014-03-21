@@ -106,7 +106,7 @@ module VagrantPlugins
           end
           
           #Bail out here if content is fubar
-          if content.empty?
+          if not content.has_key?("machines")
             return
           end
           
