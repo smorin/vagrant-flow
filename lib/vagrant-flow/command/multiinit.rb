@@ -36,7 +36,7 @@ module VagrantPlugins
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow cloudbox [-hgliq]\nThis looks for multiinit.yml as the default configuration\n"
+                        "Usage: vagrant flow multiinit [-hgliq]\nThis looks for multiinit.yml as the default configuration\n"
             o.separator ""
             o.on("-g", "--vagrant_multiinit_config_file FILEPATH", "(Optional) YAML file containing vagrant cloud config") do |f|
               options[:vagrant_cloud_config_file] = f        
