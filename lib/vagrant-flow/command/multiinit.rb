@@ -7,7 +7,7 @@ require "ipaddr"
 module VagrantPlugins
   module CommandVagrantFlow
     module Command
-      class CloudBox < Vagrant.plugin("2", :command)
+      class MultiInit < Vagrant.plugin("2", :command)
         
         # Builtin from Command class
         # Must override to provide a description
@@ -19,7 +19,7 @@ module VagrantPlugins
         # Builtin from Command class
         # Must override to provide core functionality
         def execute
-          default_group_config_file = "vagrantcloudconfig.yml"
+          default_group_config_file = "multiinitconfig.yml"
           options = {}
           options[:destroy_on_error] = true
           options[:parallel] = false
@@ -36,9 +36,9 @@ module VagrantPlugins
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow cloudbox [-hgliq]\nThis looks for vagrantcloudconfig.yml as the default configuration\n"
+                        "Usage: vagrant flow cloudbox [-hgliq]\nThis looks for multiinit.yml as the default configuration\n"
             o.separator ""
-            o.on("-g", "--vagrant_cloud_config_file FILEPATH", "(Optional) YAML file containing vagrant cloud config") do |f|
+            o.on("-g", "--vagrant_multiinit_config_file FILEPATH", "(Optional) YAML file containing vagrant cloud config") do |f|
               options[:vagrant_cloud_config_file] = f        
             end
             
@@ -105,6 +105,11 @@ module VagrantPlugins
             }
           end
           
+          #Bail out here if content is fubar
+          if content.empty?
+            return
+          end
+          
           #Set IP's for private network
           #Start at 192.168.1.0 and increment up
           #using the IPAddr class
@@ -131,7 +136,7 @@ module VagrantPlugins
           raise Vagrant::Errors::VagrantfileExistsError if save_path.exist?
           
           #Get current directory, go up one directory, then append path to templates/cloudbox.erb
-          template_path = File.join(File.expand_path("..",File.dirname(__FILE__)) , ("templates/cloudbox.erb"))
+          template_path = File.join(File.expand_path("..",File.dirname(__FILE__)) , ("templates/multiinit.erb"))
           
           #Load template file and write contents
           eruby = Erubis::Eruby.new(File.read(template_path))

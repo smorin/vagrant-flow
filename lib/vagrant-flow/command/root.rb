@@ -19,9 +19,9 @@ module VagrantPlugins
             AnsibleInventory
           end
           
-          @subcommands.register(:cloudbox) do
-            require_relative "cloudbox"
-            CloudBox
+          @subcommands.register(:multiinit) do
+            require_relative "multiinit"
+            MultiInit
           end
 
         end

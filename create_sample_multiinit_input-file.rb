@@ -12,13 +12,13 @@ x = {
   ]
 }
 
-#begin
-  File.open('vagrantcloudconfig.yml', 'w') {|f|
+begin
+  File.open('multiinitconfig.yml', 'w') {|f|
     f.write x.to_yaml
   }
-#rescue
-#  warn "Could not write file vagrantcloudconfig.yml"
-#end
+rescue
+  warn "Could not write file multiinit.yml"
+end
 
 
 y = YAML.load(x.to_yaml)
