@@ -66,7 +66,7 @@ vagrant flow ansibleinventory -p
 #Bring up your vagrant machines
 vagrant up
 #Run ansible inventory (this assumes the file groupconfig.yml exists)
-vagrant ansible-inventory
+vagrant flow ansibleinventory
 #point ansible-playbook to the generated vagrant-flow_ansible_inventory, and point them to whatever playbook you'd like
 ansible-playbook -i path/to/vagrant-flow_ansible_inventory my_playbook.yml
 ```
