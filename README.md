@@ -2,6 +2,7 @@
 
 Vagrant Plugin allows for a better ansible flow. It generates ansible inventory files to easily prepare to run ansible playbooks
 
+- This is part of [NeverwinterDP the Data Pipeline for Hadoop](https://github.com/DemandCube/NeverwinterDP)
 
 ## Installation
 
