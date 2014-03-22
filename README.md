@@ -12,7 +12,7 @@ Vagrant Plugin allows for a better ansible flow. It generates ansible inventory 
 
 * * *
 
-## FUsage and Specs
+## Usage and Specs
 vagrant-flow to has 1 command `flow` and the following subcommand:
 
 ```
