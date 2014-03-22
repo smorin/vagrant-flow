@@ -28,6 +28,11 @@ module VagrantPlugins
             require_relative "hostfile"
             HostFile
           end
+          
+          @subcommands.register(:playbook) do
+            require_relative "playbook"
+            Playbook
+          end
 
         end
 

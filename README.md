@@ -230,7 +230,46 @@ servergroup
 ```
 
 * * *
+##playbook
+```
+Usage: vagrant flow playbook [-hpf]
+Reads in config from flow-playbook.yml by default to be able to run ansible-playbook more easily
 
+    -f, --file-playbook FILE         (Optional) Use a specified playbook config file instead of default (flow-playbook.yml)
+    -p, --print-only                 (Optional) Don't actually ansible-playbook, but just output what would be run to STDOUT
+    -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
+    -h, --help                       Print this help
+```
+
+This will run ansible-playbook based on the config in flow-playbook.yml
+```
+vagrant flow playbook
+```
+
+This will run ansible-playbook based on the config in myOwnConfig.yml
+```
+vagrant flow playbook -f myOwnConfig.yml
+```
+
+This will not actually run ansible-playbook, but will only output the command it would run to STDOUT
+```
+vagrant flow playbook -p
+```
+The output from the above command using -p will look like this:
+```
+ansible-playbook -i vagrant-flow_ansible_inventory myPlaybooks/main.yml
+```
+
+###Expectations:
+Example flow-playbook.yml file
+```
+---
+:playbook: defaultplaybook.yml             #Required
+:inventory: vagrant-flow_ansible_inventory #Required
+:pattern: '*'                              #Optional.  Will be used in conjunction like so 'ansible-playbook -l [pattern] -i [inventory] -p [playbook]'
+```
+
+* * *
 
 ## Future Usage and Specs
 Looking for vagrant-flow to have the following commands:
