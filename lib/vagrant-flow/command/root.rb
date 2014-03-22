@@ -23,6 +23,11 @@ module VagrantPlugins
             require_relative "multiinit"
             MultiInit
           end
+          
+          @subcommands.register(:hostfile) do
+            require_relative "hostfile"
+            HostFile
+          end
 
         end
 
