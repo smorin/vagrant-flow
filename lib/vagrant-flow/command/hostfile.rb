@@ -23,13 +23,13 @@ module VagrantPlugins
           options[:provision_ignore_sentinel] = false
           options[:nowrite] = false
           options[:quiet] = false
-          options[:novagrantkey] = false
           
           #Parse option, look up OptionParser documentation 
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow hostfile [-hnkq]"
+                        "Usage: vagrant flow hostfile [-hnkq]\n"+
+                        "Edits all your VMs /etc/hosts file to be able to find all the machines on your private network"
             o.separator ""
            
             o.on("-q", "--quiet", "(Optional) Suppress output to STDOUT and STDERR") do |f|
@@ -38,10 +38,6 @@ module VagrantPlugins
             
             o.on("-n", "--no-write-hosts", "(Optional) Don't actually write a new hosts file to the guest machine") do |f|
               options[:nowrite] = true
-            end
-            
-            o.on("-k", "--no-default-vagrant-key", "(Optional) Does not attempt to move the default vagrant key to ~/.ssh/id_rsa") do |f|
-              options[:novagrantkey] = true
             end
           end
           argv = parse_options(opts)
@@ -116,26 +112,6 @@ module VagrantPlugins
           end
           
           
-          #Move default vagrant ssh key to ~/.ssh/id_rsa
-          if not options[:novagrantkey]
-            with_target_vms(argv, :provider => options[:provider]) do |machine|
-              #Only do for linux (omit Sun and Windows)
-              if not (machine.communicate.test("uname -s | grep SunOS") or machine.communicate.test("test -d $Env:SystemRoot"))
-                return unless machine.communicate.ready?
-                #Read in default key from Vagrant
-                key = File.read(File.expand_path("keys/vagrant", Vagrant.source_root))
-                
-                #Make sure ~/.ssh/id_rsa exists
-                machine.communicate.execute("touch ~/.ssh/id_rsa")
-                #Make it writeable
-                machine.communicate.execute("chmod 777 ~/.ssh/id_rsa")
-                #Append key to it
-                machine.communicate.execute("echo "+"\n"+"\""+key+"\">>~/.ssh/id_rsa")
-                #Set permissions back to 400
-                machine.communicate.execute("chmod 400 ~/.ssh/id_rsa")
-              end
-            end
-          end
             
         end
         
