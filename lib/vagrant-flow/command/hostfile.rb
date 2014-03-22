@@ -1,6 +1,6 @@
 require "vagrant"
 require 'optparse'
-
+require 'tempfile'
 
 module VagrantPlugins
   module CommandVagrantFlow
@@ -17,136 +17,128 @@ module VagrantPlugins
         # Builtin from Command class
         # Must override to provide core functionality
         def execute
-          default_group_config_file = "multiinitconfig.yml"
           options = {}
           options[:destroy_on_error] = true
           options[:parallel] = false
           options[:provision_ignore_sentinel] = false
+          options[:nowrite] = false
           options[:quiet] = false
-          
-          #Default virtualbox__intnet name for private network
-          options[:vboxintnet] = "neverwinterDP"
-          
-          #Setting to read in a file other than default_group_config_File
-          options[:vagrant_cloud_config_file] = false
+          options[:novagrantkey] = false
           
           #Parse option, look up OptionParser documentation 
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow multiinit [-hgliq]\nThis looks for multiinit.yml as the default configuration\n"
+                        "Usage: vagrant flow hostfile [-hnkq]"
             o.separator ""
-            o.on("-g", "--vagrant_multiinit_config_file FILEPATH", "(Optional) YAML file containing vagrant cloud config") do |f|
-              options[:vagrant_cloud_config_file] = f        
-            end
-            
-            o.on( '-l', '--list hostname:cloud/location,hostname2:cloud/location2,hostname3:cloud/location3', Array, "List of cloud config parameters" ) do|f|
-              options[:vagrant_cloud_list] = f
-            end
-            
-            o.on("-i", "--vboxintnet NAME", "(Optional) Custom virtualbox__intnet name for private network") do |f|
-              options[:vboxintnet] = f
-            end
-            
+           
             o.on("-q", "--quiet", "(Optional) Suppress output to STDOUT and STDERR") do |f|
               options[:quiet] = true
             end
             
+            o.on("-n", "--no-write-hosts", "(Optional) Don't actually write a new hosts file to the guest machine") do |f|
+              options[:nowrite] = true
+            end
+            
+            o.on("-k", "--no-default-vagrant-key", "(Optional) Does not attempt to move the default vagrant key to ~/.ssh/id_rsa") do |f|
+              options[:novagrantkey] = true
+            end
           end
-  
-          # Parse the options # Builtin from the Command Class
-          # Will safely parse the arguments and 
-          # Automatically detects -h for help
           argv = parse_options(opts)
           return if !argv
           
           
-          #If no options are given, set the config file to the default
-          #and continue on our merry way
-          if not options[:vagrant_cloud_config_file] and not options[:vagrant_cloud_list]
-            options[:vagrant_cloud_config_file] = default_group_config_file
-          end
-          
-          #Get machine configs from config file or from command line
-          content = {}
-          if options[:vagrant_cloud_config_file]
-            begin
-              #Load YAML
-              content = YAML.load_file(options[:vagrant_cloud_config_file])
-            rescue
-              #Give warning if no file could be found
-              if not options[:quiet]
-                warn "Could not open file: "+options[:vagrant_cloud_config_file].to_s
-              end
-            end
-            
-            #Set intnetName if its not in the config
-            if not content.has_key?(:intnetName)
-              content[:intnetName]=options[:vboxintnet]
-            end
-            
-          end
-          
-          #Read in command line config
-          if options[:vagrant_cloud_list]
-            machines = []
-            options[:vagrant_cloud_list].each {|item|
-              split = item.split(":")
-              machines.push({
-                              "name"=>split[0],
-                              "url"=>split[1],
-                              })
-            }
-            content = {
-              :intnetName=>options[:vboxintnet],
-              "machines" => machines,
+          hostinfo=[]
+          #Go through config
+          #Map hostnames to IP's
+          with_target_vms(argv, :provider => options[:provider]) do |machine|
+            return unless machine.communicate.ready?
+            hostname = machine.config.vm.hostname
+            machine.config.vm.networks.each {|networks|
+              networks.each {|net|
+                if net.is_a?(Hash) and net.has_key?(:ip)
+                  hostinfo.push(
+                    {
+                        :hostname=>hostname,
+                        :ip=>net[:ip]
+                    })
+                end                
+              }
             }
           end
           
-          #Bail out here if content is fubar
-          if not content.has_key?("machines")
-            return
-          end
-          
-          #Set IP's for private network
-          #Start at 192.168.1.0 and increment up
-          #using the IPAddr class
-          ip= IPAddr.new("192.168.1.0")
-          content["machines"].each {|machine|
-            ip = IPAddr.new(ip.to_s).succ
-            
-            #If IP ends in x.x.x.0 or x.x.x.1, keep going one more
-            #to avoid conflicts with routers/gateways/etc
-            if ip.to_s.split(//).last(2) == [".","0"]
-              ip = IPAddr.new(ip.to_s).succ
-            end
-            if ip.to_s.split(//).last(2) == [".","1"]
-              ip = IPAddr.new(ip.to_s).succ
-            end
-            machine["ip"] =   ip.to_s
+          #What we're going to add to the end of the guest's hostfile
+          #A combination of IP's and hostnames
+          toconcatenate="\n"+"##ADDED BY NEVERWINTERDP'S VAGRANT-FLOW HOSTFILE COMMAND"+"\n"
+          hostinfo.each {|x|
+            toconcatenate+=x[:ip]+"   "+x[:hostname]+"\n"
           }
           
           
-          #Put Vagrantfile in pwd
-          save_path = Pathname.new("Vagrantfile").expand_path(@env.cwd)
-          
-          #Error out if Vagrantfile already exists
-          raise Vagrant::Errors::VagrantfileExistsError if save_path.exist?
-          
-          #Get current directory, go up one directory, then append path to templates/cloudbox.erb
-          template_path = File.join(File.expand_path("..",File.dirname(__FILE__)) , ("templates/multiinit.erb"))
-          
-          #Load template file and write contents
-          eruby = Erubis::Eruby.new(File.read(template_path))
-          begin
-            save_path.open("w+") do |f|
-              f.write(eruby.evaluate(content))
+          #Read in guest's current hosts file
+          #Append our new entries to it
+          #Write it out onto the guest's hosts file
+          with_target_vms(argv, :provider => options[:provider]) do |machine|
+            return unless machine.communicate.ready?
+            
+            #This block of code was shamelessly stolen from
+            #https://github.com/smdahlen/vagrant-hostmanager/blob/master/lib/vagrant-hostmanager/hosts_file.rb
+            #Why reinvent the wheel?
+            #Determines what the move command and where /etc/hosts should be for linux, windows, and sunOS
+            if (machine.communicate.test("uname -s | grep SunOS"))
+              realhostfile = '/etc/inet/hosts'
+              move_cmd = 'mv'
+            elsif (machine.communicate.test("test -d $Env:SystemRoot"))
+              realhostfile = "#{ENV['WINDIR']}\\System32\\drivers\\etc\\hosts"
+              move_cmd = 'mv -force'
+            else 
+              realhostfile = '/etc/hosts'
+              move_cmd = 'mv'
             end
-          rescue Errno::EACCES
-            raise Vagrant::Errors::VagrantfileWriteError
+            
+            #Back to my code
+            #Grab Vagrant's temp file location
+            guesthostfilepath = @env.tmp_path.join("hosts."+machine.config.vm.hostname)
+            #Download guest's hosts file
+            machine.communicate.download(realhostfile, guesthostfilepath)
+            
+            #Append our hostname/IP info to the end of the hosts file
+            guesthostfile = File.open(guesthostfilepath,"a")
+            guesthostfile.write(toconcatenate)
+            guesthostfile.close()
+            
+            if not options[:nowrite]  
+              #Upload updated hosts file to guest to temp location
+              machine.communicate.upload(guesthostfile.path, '/tmp/hosts')
+              #Move temp file over on top of hosts file
+              machine.communicate.sudo(move_cmd+" /tmp/hosts "+realhostfile)  
+            end
           end
           
+          
+          #Move default vagrant ssh key to ~/.ssh/id_rsa
+          if not options[:novagrantkey]
+            with_target_vms(argv, :provider => options[:provider]) do |machine|
+              #Only do for linux (omit Sun and Windows)
+              if not (machine.communicate.test("uname -s | grep SunOS") or machine.communicate.test("test -d $Env:SystemRoot"))
+                return unless machine.communicate.ready?
+                #Read in default key from Vagrant
+                key = File.read(File.expand_path("keys/vagrant", Vagrant.source_root))
+                
+                #Make sure ~/.ssh/id_rsa exists
+                machine.communicate.execute("touch ~/.ssh/id_rsa")
+                #Make it writeable
+                machine.communicate.execute("chmod 777 ~/.ssh/id_rsa")
+                #Append key to it
+                machine.communicate.execute("echo "+"\n"+"\""+key+"\">>~/.ssh/id_rsa")
+                #Set permissions back to 400
+                machine.communicate.execute("chmod 400 ~/.ssh/id_rsa")
+              end
+            end
+          end
+            
         end
+        
       end       
     end    
   end
