@@ -10,6 +10,11 @@ Vagrant Plugin allows for a better ansible flow. It generates ansible inventory 
 `vagrant plugin install vagrant-flow`
 
 
+## Contributing
+
+See the [NeverwinterDP Guide to Contributing] (https://github.com/DemandCube/NeverwinterDP#how-to-contribute)
+
+
 * * *
 
 ## Usage and Specs
@@ -331,9 +336,6 @@ vagrant ssh frontend1 ping frontend2
 vagrant ssh frontend2 ping frontend1
 ```
 
-## Contributing
-
-See the [NeverwinterDP Guide to Contributing] (https://github.com/DemandCube/NeverwinterDP#how-to-contribute)
 
 
 
