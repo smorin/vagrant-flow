@@ -43,7 +43,7 @@ git clone http://github.com/DemandCube/DeveloperPlaybooks
 mkdir devsetup
 cd devsetup
 vagrant flow multiinit -l boxname1:demandcube/centos-65_x86_64-VB-4.3.8,boxname2:demandcube/centos-65_x86_65-VB-4.3.8
-vagrand up
+vagrant up
 vagrant flow hostfile
 vagrant flow ansibleinventory
 
