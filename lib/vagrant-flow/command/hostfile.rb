@@ -63,6 +63,14 @@ module VagrantPlugins
             }
           end
           
+          #Print out Hostname and IP
+          if not options[:quiet]
+            puts "HOSTS FILE INFO:"
+            hostinfo.each {|x|
+              puts x[:hostname]+": "+x[:ip]
+            }
+          end
+          
           #What we're going to add to the end of the guest's hostfile
           #A combination of IP's and hostnames
           toconcatenate="\n"+"##ADDED BY NEVERWINTERDP'S VAGRANT-FLOW HOSTFILE COMMAND"+"\n"
