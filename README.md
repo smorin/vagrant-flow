@@ -4,26 +4,60 @@ Vagrant Plugin allows for a better ansible flow. It generates ansible inventory 
 
 - This is part of [NeverwinterDP the Data Pipeline for Hadoop](https://github.com/DemandCube/NeverwinterDP)
 
+
 ## Installation
 
 `vagrant plugin install vagrant-flow`
 
 
-Below is how to install as a regular gem which won't work
+## Contributing
 
-Add this line to your application's Gemfile:
+See the [NeverwinterDP Guide to Contributing] (https://github.com/DemandCube/NeverwinterDP#how-to-contribute)
 
-    gem 'vagrant-flow'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install vagrant-flow
 
 * * *
+
+## Usage and Specs
+vagrant-flow to has 1 command `flow` and the following subcommand:
+
+```
+multiinit
+hostfile
+ansibleinventory
+playbook
+```
+
+- multiinit
+  - Creates a template Vagrantfile based on the machines you specify
+- hostfile
+  - Creates a hostfile and copies it to each VM so that machine can talk to each other
+- ansibleinventory
+  - Create a ansible machine inventory file so that you can use ansible to provision the machines
+- playbook
+  - Uses a confile to run ansible-play book to provision one or more VM's
+
+Example flow to be enabled
+```
+vagrant plugin install vagrant-flow
+git clone http://github.com/DemandCube/DeveloperPlaybooks
+mkdir devsetup
+cd devsetup
+vagrant flow multiinit -l boxname1:demandcube/centos-65_x86_64-VB-4.3.8,boxname2:demandcube/centos-65_x86_65-VB-4.3.8
+vagrant up
+vagrant flow hostfile
+vagrant flow ansibleinventory
+
+# Then
+
+vagrant flow playbook
+# or
+ansible-playbook -i ansible-flow_inventoryfile ../DeveloperPlaybooks/site.yml
+
+#communication test
+vagrant ssh boxname1 ping boxname2
+vagrant ssh boxname2 ping boxname1
+```
+
 
 # Usage
 
@@ -302,13 +336,7 @@ vagrant ssh frontend1 ping frontend2
 vagrant ssh frontend2 ping frontend1
 ```
 
-## Contributing
 
-1. Fork it ( http://github.com/DemandCube/vagrant-flow/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
 
 
 ## Development Flow
@@ -353,6 +381,22 @@ Creating a Gem
 =====
 * Tutorial <>
 * <http://railscasts.com/episodes/245-new-gem-with-bundler>
+
+Below is how to install as a regular gem which won't work
+
+Add this line to your application's Gemfile:
+
+    gem 'vagrant-flow'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install vagrant-flow
+
+* * *
 
 Commands 
 
