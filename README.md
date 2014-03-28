@@ -1,6 +1,8 @@
 # Vagrant-Flow
 
-Vagrant Plugin allows for a better ansible flow. It generates ansible inventory files to easily prepare to run ansible playbooks
+Vagrant-Flow enables a seamless development to production workflow.
+
+Vagrant-Flow is a vagrant plugin which allows for a separation of ansible playbooks from vagrant, mimicing how development works. It enables the generates ansible inventory files, vagrant templates and inter-machine communication to easily prepare to run ansible playbooks and machine communication.
 
 - This is part of [NeverwinterDP the Data Pipeline for Hadoop](https://github.com/DemandCube/NeverwinterDP)
 
