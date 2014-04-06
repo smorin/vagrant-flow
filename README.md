@@ -134,17 +134,24 @@ machines:
 
 * * *
 ##hostfile
-Usage: vagrant flow hostfile [-hnkq]
+Usage: vagrant flow hostfile [-qndoh]
 Edits all your VMs /etc/hosts file to be able to find all the machines on your private network
 
     -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
     -n, --no-write-hosts             (Optional) Don't actually write a new hosts file to the guest machine
+    -d, --digitalocean               (Optional) Writes your digital ocean's hostnames and IP addresses to hosts file.  Default file is hostfile_do.yml
+    -o, --digitaloceanfile FILE      (Optional) File to read in for -d option instead of hostfile_do.yml
     -h, --help                       Print this help
 
 #### Example usages of hostfile
 This will look through your vagrantfile config, find all the hostnames and IP's configured in your private_network, and append that information to all your machine's /etc/hosts file
 ```
 vagrant flow hostfile
+```
+
+This will make an API call to digital ocean (https://developers.digitalocean.com/droplets/), retrieve your list of hostnames and Ip's, and append that information retrieved from DO to the VM's hosts file specified in your Vagrantfile. The config file it will look for by default is hostfile_do.yml
+```
+vagrant flow hostfile -d
 ```
 
 Example Vagrantfile excerpt.  This configuration is required by hostfile to be able to determine IP addresses and hostnames.
@@ -163,6 +170,15 @@ If you're already using vagrant flow multiinit, then this configuration is alrea
     server2.vm.network :private_network, ip: "192.168.1.3", virtualbox__intnet: "neverwinterDP"
     server2.vm.hostname = "server2"
   end
+```
+
+Example hostfile_do.yml (For use only with -d option)
+To find your apikey and clientid, log into digital ocean, and visit https://cloud.digitalocean.com/api_access
+```
+---
+:api_key: abcdefghijklmnopqrstuvwxyz
+:client_id: zyxwvutsrqponmlkjihgfedcba
+
 ```
 
 * * *

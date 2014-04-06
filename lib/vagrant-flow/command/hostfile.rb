@@ -36,7 +36,7 @@ module VagrantPlugins
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow hostfile [-hnkq]\n"+
+                        "Usage: vagrant flow hostfile [-qndoh]\n"+
                         "Edits all your VMs /etc/hosts file to be able to find all the machines on your private network"
             o.separator ""
 
