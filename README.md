@@ -116,9 +116,11 @@ vagrant flow multiinit -l boxname1:demandcube/centos-65_x86_64-VB-4.3.8,boxname2
 vagrant flow multiinit
 #Launch the boxes
 vagrant up
+#Or launch with digitalocean
+vagrant up --provider=digital_ocean
 ```
 
-Example multiinitconfig.yml file (for use with no optional command line arguments or by pointing to non-default file with -g option).  The format of this yaml file MUST be followed, but can easily be expanded to include more of fewer machines
+Example multiinitconfig.yml file (for use with no optional command line arguments or by pointing to non-default file with -g option).  The format and parameters of this yaml file MUST be followed, but can easily be expanded to include more of fewer machines
 ```
 ---
 :intnetName: neverwinterDP
@@ -129,6 +131,27 @@ machines:
   url: demandcube/centos-64_x86_64-VB-4.3.8
 - name: jenkinstestmachine
   url: demandcube/centos-65_x86_64-VB-4.3.8
+
+```
+
+Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.
+```
+---
+:sshPrivateKeyPath: ~/.ssh/id_rsa #Points to your private key file
+:digitalOceanApiKey: yourkeygoeshere #Get your digitalocen api key and client id from https://cloud.digitalocean.com/api_access
+:digitalOceanClientId: youclientidgoeshere
+:digitalOceanRegion: San Francisco 1 #This corresponds to the region option when creating droplets
+:intnetName: neverwinterDP
+machines:
+- name: sparkngin1
+  url: demandcube/centos-65_x86_64-VB-4.3.8
+  digitalOceanImage: CentOS 6.5 x64  #This is the Image name you choose when creating a new droplet
+- name: sparkngin2
+  url: demandcube/centos-65_x86_64-VB-4.3.8
+  digitalOceanImage: CentOS 6.5 x64
+- name: jenkinsdp
+  url: demandcube/centos-65_x86_64-VB-4.3.8
+  digitalOceanImage: CentOS 6.5 x64
 
 ```
 
