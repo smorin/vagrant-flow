@@ -9,8 +9,18 @@ Vagrant-Flow is a vagrant plugin which allows for a separation of ansible playbo
 
 ## Installation
 
-`vagrant plugin install vagrant-flow`
+```
+#This is so 'vagrant flow hostfile' can automatically connect to digital ocean machines
+#Otherwise it will hang when dealing with remote hosts
+echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
+#If you're on OSX
+brew install curl-ca-bundle
+
+
+vagrant plugin install vagrant-digitalocean
+vagrant plugin install vagrant-flow
+```
 
 ## Contributing
 
@@ -20,7 +30,7 @@ See the [NeverwinterDP Guide to Contributing] (https://github.com/DemandCube/Nev
 * * *
 
 ## Usage and Specs
-vagrant-flow to has 1 command `flow` and the following subcommand:
+vagrant-flow has 1 command `flow` and the following subcommands:
 
 ```
 multiinit

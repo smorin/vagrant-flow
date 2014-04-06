@@ -1,0 +1,34 @@
+require 'yaml'
+
+
+
+###This shows how to make a valid configuration file in YAML format for vagrant-flow to consume with the ansible-inventory command
+x = {
+  :sshPrivateKeyPath =>"~/.ssh/id_rsa",
+  :digitalOceanApiKey => "digitaloceanapikeygoeshere",
+  :digitalOceanClientId => "digitaloceanclientidgoeshere",
+  :digitalOceanRegion => "San Francisco 1",
+  :intnetName=>"neverwinterDP",
+  "machines" => [
+   {"name"=>"sparkngin1", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8", "digitalOceanImage"=>"CentOS 6.5 x64"},
+   {"name"=>"sparkngin2", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8", "digitalOceanImage"=>"CentOS 6.5 x64"},
+   {"name"=>"jenkinsdp", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8", "digitalOceanImage"=>"CentOS 6.5 x64"},
+  ]
+}
+
+begin
+  File.open('multiinitconfig.yml', 'w') {|f|
+    f.write x.to_yaml
+  }
+rescue
+  warn "Could not write file multiinit.yml"
+end
+
+
+y = YAML.load(x.to_yaml)
+
+y.each {|key,value|
+  puts key
+  puts value
+  puts "\n"
+}
