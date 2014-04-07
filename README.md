@@ -70,6 +70,12 @@ vagrant ssh boxname1 ping boxname2
 vagrant ssh boxname2 ping boxname1
 ```
 
+#DemandCube Boxes
+Publically available boxes in vagrantcloud from DemandCube:
+- vagrant init demandcube/centos-64_x86_64-VB-4.3.8
+- vagrant init demandcube/centos-65_x86_64-VB-4.3.8
+
+
 
 # Usage
 
