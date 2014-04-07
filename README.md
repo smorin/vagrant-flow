@@ -126,7 +126,6 @@ Example multiinitconfig.yml file (for use with no optional command line argument
 :intnetName: neverwinterDP
 machines:
 - name: machine1
-  url: demandcube/centos-65_x86_64-VB-4.3.8
 - name: server1
   url: demandcube/centos-64_x86_64-VB-4.3.8
 - name: jenkinstestmachine
@@ -137,21 +136,34 @@ machines:
 Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.
 ```
 ---
-:sshPrivateKeyPath: ~/.ssh/id_rsa #Points to your private key file
-:digitalOceanApiKey: yourkeygoeshere #Get your digitalocen api key and client id from https://cloud.digitalocean.com/api_access
-:digitalOceanClientId: youclientidgoeshere
-:digitalOceanRegion: San Francisco 1 #This corresponds to the region option when creating droplets
+:sshPrivateKeyPath: ~/.ssh/id_rsa
+
+#These two keys (digitalOceanApiKey and digitalOceanClientId) must be set for digitalocean to work
+#Omit them if you don't want digitalocean as a provider option in your vagrantfile
+:digitalOceanApiKey: 782a1d830f62e57d985eb7b1c938f94f
+:digitalOceanClientId: ae856c82c79398598838f3f93b7a7d5e
+
 :intnetName: neverwinterDP
+
 machines:
-- name: sparkngin1
-  url: demandcube/centos-65_x86_64-VB-4.3.8
-  digitalOceanImage: CentOS 6.5 x64  #This is the Image name you choose when creating a new droplet
-- name: sparkngin2
-  url: demandcube/centos-65_x86_64-VB-4.3.8
-  digitalOceanImage: CentOS 6.5 x64
-- name: jenkinsdp
-  url: demandcube/centos-65_x86_64-VB-4.3.8
-  digitalOceanImage: CentOS 6.5 x64
+  #Create a box with all defaults set for you
+- name: fulldefaults
+
+  #Use a custom url for your virtual box image
+- name: customvboxurl
+  url: demandcube/centos-64_x86_64-VB-4.3.8
+
+  #Set custom config for digitalocean
+- name: digitaloceancustom
+  digitalOceanRegion: New York 2
+  digitalOceanImage: Debian 7.0 x64
+
+  #Set custom config for vbox and digitaloceanprovider
+- name: digitaloceanvboxcustom
+  url: demandcube/centos-64_x86_64-VB-4.3.8
+  digitalOceanRegion: New York 2
+  digitalOceanImage: Debian 7.0 x64
+
 
 ```
 

@@ -4,15 +4,20 @@ require 'yaml'
 
 ###This shows how to make a valid configuration file in YAML format for vagrant-flow to consume with the ansible-inventory command
 x = {
+  #~/.ssh/id_rsa is also the default
   :sshPrivateKeyPath =>"~/.ssh/id_rsa",
-  :digitalOceanApiKey => "digitaloceanapikeygoeshere",
-  :digitalOceanClientId => "digitaloceanclientidgoeshere",
-  :digitalOceanRegion => "San Francisco 1",
+  
+  #These two keys must be set for digitalocean to work
+  #Omit them if you don't want digitalocean as a provider option in your vagrantfile
+  :digitalOceanApiKey => "123456789098765432",
+  :digitalOceanClientId => "fytudisughfsdalk",
+  
   :intnetName=>"neverwinterDP",
   "machines" => [
-   {"name"=>"sparkngin1", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8", "digitalOceanImage"=>"CentOS 6.5 x64"},
-   {"name"=>"sparkngin2", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8", "digitalOceanImage"=>"CentOS 6.5 x64"},
-   {"name"=>"jenkinsdp", "url"=>"demandcube/centos-65_x86_64-VB-4.3.8", "digitalOceanImage"=>"CentOS 6.5 x64"},
+   {"name"=>"fulldefaults"},
+   {"name"=>"customvboxurl", "url"=>"demandcube/centos-64_x86_64-VB-4.3.8",},
+   {"name"=> "digitaloceancustom", "digitalOceanRegion" => "New York 2", "digitalOceanImage"=>"Debian 7.0 x64"},
+   {"name"=> "digitaloceanvboxcustom", "url"=>"demandcube/centos-64_x86_64-VB-4.3.8", "digitalOceanRegion" => "New York 2", "digitalOceanImage"=>"Debian 7.0 x64" },
   ]
 }
 
