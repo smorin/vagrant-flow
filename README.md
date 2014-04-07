@@ -125,7 +125,9 @@ Example multiinitconfig.yml file (for use with no optional command line argument
 ---
 :intnetName: neverwinterDP
 machines:
+  #This will use all defaults and create a guest named machine1
 - name: machine1
+  #Create another machine, but specify which .box to use with virtual box
 - name: server1
   url: demandcube/centos-64_x86_64-VB-4.3.8
 - name: jenkinstestmachine
@@ -136,6 +138,8 @@ machines:
 Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.
 ```
 ---
+#Where your ssh private key lives (for use with digital ocean)
+#~/.ssh/id_rsa is the default, so you can omit this value if you want
 :sshPrivateKeyPath: ~/.ssh/id_rsa
 
 #These two keys (digitalOceanApiKey and digitalOceanClientId) must be set for digitalocean to work
@@ -144,7 +148,6 @@ Example multiinitconfig.yml file for use with virtualbox and digitalocean provid
 :digitalOceanClientId: ae856c82c79398598838f3f93b7a7d5e
 
 :intnetName: neverwinterDP
-
 machines:
   #Create a box with all defaults set for you
 - name: fulldefaults
