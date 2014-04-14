@@ -26,6 +26,15 @@ module VagrantPlugins
           options[:provision_ignore_sentinel] = false
           options[:quiet] = false
           
+          
+          #Defaults for machine and configs
+          default_sshPrivateKeyPath ="~/.ssh/id_rsa"
+          machineDefaults = {
+            "url"                => "demandcube/centos-65_x86_64-VB-4.3.8",
+            "digitalOceanImage"  =>"CentOS 6.5 x64",
+            "digitalOceanRegion" => "San Francisco 1"
+          }
+          
           #Default virtualbox__intnet name for private network
           options[:vboxintnet] = "neverwinterDP"
           
@@ -127,6 +136,22 @@ module VagrantPlugins
             end
             machine["ip"] =   ip.to_s
           }
+          
+          #Set default ssh private key (used by digitalocean provider option)
+          if not content.has_key?(:sshPrivateKeyPath)
+            content[:sshPrivateKeyPath] = default_sshPrivateKeyPath
+          end
+          
+          
+          content["machines"].each {|machine|
+            #Set defaults for digital ocean provicder if they're not provided in the config
+            machineDefaults.each {|key,val|
+              if not machine.has_key?(key)
+                machine[key] = val
+              end
+            }
+          }
+          
           
           
           #Put Vagrantfile in pwd
