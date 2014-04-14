@@ -1,6 +1,10 @@
 require "vagrant"
 require 'optparse'
 require 'tempfile'
+require 'yaml'
+
+#Require my library for talking to digitalocean
+require File.expand_path(File.dirname(__FILE__) ) +"/digitalocean_api"
 
 module VagrantPlugins
   module CommandVagrantFlow
@@ -25,12 +29,14 @@ module VagrantPlugins
           options[:provision_ignore_sentinel] = false
           options[:nowrite] = false
           options[:quiet] = false
+          options[:digitalocean] = false
+          options[:digitalocean_file] = "hostfile_do.yml"
 
           #Parse option, look up OptionParser documentation
           opts = OptionParser.new do |o|
             # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow hostfile [-hnkq]\n"+
+                        "Usage: vagrant flow hostfile [-qndoh]\n"+
                         "Edits all your VMs /etc/hosts file to be able to find all the machines on your private network"
             o.separator ""
 
@@ -41,30 +47,46 @@ module VagrantPlugins
             o.on("-n", "--no-write-hosts", "(Optional) Don't actually write a new hosts file to the guest machine") do |f|
               options[:nowrite] = true
             end
+            
+            o.on("-d", "--digitalocean", "(Optional) Writes your digital ocean's hostnames and IP addresses to hosts file.  Default file is hostfile_do.yml") do |f|
+              options[:digitalocean] = true
+            end
+            
+            o.on("-o", "--digitaloceanfile FILE", "(Optional) File to read in for -d option instead of hostfile_do.yml") do |f|
+              options[:digitalocean_file] = f
+            end
           end
           argv = parse_options(opts)
           return if !argv
-
+          
+          
 
           hostinfo=[]
           #Go through config
           #Map hostnames to IP's
-          with_target_vms(argv, :provider => options[:provider]) do |machine|
-            return unless machine.communicate.ready?
-            hostname = machine.config.vm.hostname
-            machine.config.vm.networks.each {|networks|
-              networks.each {|net|
-                if net.is_a?(Hash) and net.has_key?(:ip)
-                  hostinfo.push(
-                    {
-                        :hostname=>hostname,
-                        :ip=>net[:ip]
-                    })
-                end
+          if options[:digitalocean]
+            config = YAML.load_file(options[:digitalocean_file])
+            digitalocean = DigitalOcean_Api.new()
+            hostinfo = digitalocean.getHostNamesAndIps(config[:client_id],config[:api_key])
+          else
+            with_target_vms(argv, :provider => options[:provider]) do |machine|
+              return unless machine.communicate.ready?
+              hostname = machine.config.vm.hostname
+              machine.config.vm.networks.each {|networks|
+                networks.each {|net|
+                  if net.is_a?(Hash) and net.has_key?(:ip)
+                    hostinfo.push(
+                      {
+                          :hostname=>hostname,
+                          :ip=>net[:ip]
+                      })
+                  end
+                }
               }
-            }
+            end
           end
-
+          
+          
           #Print out Hostname and IP
           if not options[:quiet]
             puts "HOSTS FILE INFO:"
