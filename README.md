@@ -9,8 +9,18 @@ Vagrant-Flow is a vagrant plugin which allows for a separation of ansible playbo
 
 ## Installation
 
-`vagrant plugin install vagrant-flow`
+```
+#This is so 'vagrant flow hostfile' can automatically connect to digital ocean machines
+#Otherwise it will hang when dealing with remote hosts
+echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
+#If you're on OSX
+brew install curl-ca-bundle
+
+
+vagrant plugin install vagrant-digitalocean
+vagrant plugin install vagrant-flow
+```
 
 ## Contributing
 
@@ -20,7 +30,7 @@ See the [NeverwinterDP Guide to Contributing] (https://github.com/DemandCube/Nev
 * * *
 
 ## Usage and Specs
-vagrant-flow to has 1 command `flow` and the following subcommand:
+vagrant-flow has 1 command `flow` and the following subcommands:
 
 ```
 multiinit
@@ -59,6 +69,12 @@ ansible-playbook -i ansible-flow_inventoryfile ../DeveloperPlaybooks/site.yml
 vagrant ssh boxname1 ping boxname2
 vagrant ssh boxname2 ping boxname1
 ```
+
+#DemandCube Boxes
+Publically available boxes in vagrantcloud from DemandCube:
+- vagrant init demandcube/centos-64_x86_64-VB-4.3.8
+- vagrant init demandcube/centos-65_x86_64-VB-4.3.8
+
 
 
 # Usage
@@ -106,15 +122,18 @@ vagrant flow multiinit -l boxname1:demandcube/centos-65_x86_64-VB-4.3.8,boxname2
 vagrant flow multiinit
 #Launch the boxes
 vagrant up
+#Or launch with digitalocean
+vagrant up --provider=digital_ocean
 ```
 
-Example multiinitconfig.yml file (for use with no optional command line arguments or by pointing to non-default file with -g option).  The format of this yaml file MUST be followed, but can easily be expanded to include more of fewer machines
+Example multiinitconfig.yml file (for use with no optional command line arguments or by pointing to non-default file with -g option).  The format and parameters of this yaml file MUST be followed, but can easily be expanded to include more of fewer machines
 ```
 ---
 :intnetName: neverwinterDP
 machines:
+  #This will use all defaults and create a guest named machine1
 - name: machine1
-  url: demandcube/centos-65_x86_64-VB-4.3.8
+  #Create another machine, but specify which .box to use with virtual box
 - name: server1
   url: demandcube/centos-64_x86_64-VB-4.3.8
 - name: jenkinstestmachine
@@ -122,19 +141,61 @@ machines:
 
 ```
 
+Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.
+```
+---
+#Where your ssh private key lives (for use with digital ocean)
+#~/.ssh/id_rsa is the default, so you can omit this value if you want
+:sshPrivateKeyPath: ~/.ssh/id_rsa
+
+#These two keys (digitalOceanApiKey and digitalOceanClientId) must be set for digitalocean to work
+#Omit them if you don't want digitalocean as a provider option in your vagrantfile
+:digitalOceanApiKey: 782a1d830f62e57d985eb7b1c938f94f
+:digitalOceanClientId: ae856c82c79398598838f3f93b7a7d5e
+
+:intnetName: neverwinterDP
+machines:
+  #Create a box with all defaults set for you
+- name: fulldefaults
+
+  #Use a custom url for your virtual box image
+- name: customvboxurl
+  url: demandcube/centos-64_x86_64-VB-4.3.8
+
+  #Set custom config for digitalocean
+- name: digitaloceancustom
+  digitalOceanRegion: New York 2
+  digitalOceanImage: Debian 7.0 x64
+
+  #Set custom config for vbox and digitaloceanprovider
+- name: digitaloceanvboxcustom
+  url: demandcube/centos-64_x86_64-VB-4.3.8
+  digitalOceanRegion: New York 2
+  digitalOceanImage: Debian 7.0 x64
+
+
+```
+
 * * *
 ##hostfile
-Usage: vagrant flow hostfile [-hnkq]
+Usage: vagrant flow hostfile [-qndoh]
 Edits all your VMs /etc/hosts file to be able to find all the machines on your private network
 
     -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
     -n, --no-write-hosts             (Optional) Don't actually write a new hosts file to the guest machine
+    -d, --digitalocean               (Optional) Writes your digital ocean's hostnames and IP addresses to hosts file.  Default file is hostfile_do.yml
+    -o, --digitaloceanfile FILE      (Optional) File to read in for -d option instead of hostfile_do.yml
     -h, --help                       Print this help
 
 #### Example usages of hostfile
 This will look through your vagrantfile config, find all the hostnames and IP's configured in your private_network, and append that information to all your machine's /etc/hosts file
 ```
 vagrant flow hostfile
+```
+
+This will make an API call to digital ocean (https://developers.digitalocean.com/droplets/), retrieve your list of hostnames and Ip's, and append that information retrieved from DO to the VM's hosts file specified in your Vagrantfile. The config file it will look for by default is hostfile_do.yml
+```
+vagrant flow hostfile -d
 ```
 
 Example Vagrantfile excerpt.  This configuration is required by hostfile to be able to determine IP addresses and hostnames.
@@ -153,6 +214,15 @@ If you're already using vagrant flow multiinit, then this configuration is alrea
     server2.vm.network :private_network, ip: "192.168.1.3", virtualbox__intnet: "neverwinterDP"
     server2.vm.hostname = "server2"
   end
+```
+
+Example hostfile_do.yml (For use only with -d option)
+To find your apikey and clientid, log into digital ocean, and visit https://cloud.digitalocean.com/api_access
+```
+---
+:api_key: abcdefghijklmnopqrstuvwxyz
+:client_id: zyxwvutsrqponmlkjihgfedcba
+
 ```
 
 * * *
@@ -415,3 +485,4 @@ rake install               # It's a helper that will build and install locally
 rake release               # It's a helper that will push/release to rubygems
 
 ```
+!!!!
