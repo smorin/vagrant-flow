@@ -1,6 +1,7 @@
 require "net/http"
 require "uri"
 require "json"
+require "uri"
 
 class DigitalOcean_Api
   
@@ -10,11 +11,7 @@ class DigitalOcean_Api
   
   #getparams should be a hash that will get turned into a url
   def makeApiCall(getparams)
-    url = @DIGITALOCEAN_URL
-    getparams.each {|key,val|
-      url+=key+"="+val+"&"
-    }
-    url = url.chomp("&")
+    url = @DIGITALOCEAN_URL + URI.encode_www_form(getparams)
     
     response = Net::HTTP.get_response(URI.parse(url))
     
