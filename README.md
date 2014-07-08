@@ -173,6 +173,15 @@ machines:
   digitalOceanRegion: New York 2
   digitalOceanImage: Debian 7.0 x64
 
+  #Set custom config for vbox and digitaloceanprovider and sets amount of RAM
+- name: digitaloceanvboxcustom
+  url: demandcube/centos-64_x86_64-VB-4.3.8
+  digitalOceanRegion: New York 2
+  digitalOceanImage: Debian 7.0 x64
+  ram: 2GB
+  #Valid options for RAM (This is a digital ocean restriction):
+  #    512MB, 1GB, 2GB, 4GB, 8GB, 16GB, 32GB, 48GB, 64GB
+  #Default RAM is 512MB
 
 ```
 

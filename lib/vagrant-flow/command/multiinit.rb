@@ -168,7 +168,7 @@ module VagrantPlugins
             
             #Check if RAM value is valid (Digital Ocean restriction)
             if not allowedRam.include?(machine["ram"])
-              stderr.puts "ram option not valid: "+machine["ram"]+"\nSetting to 512MB"
+              STDERR.puts "ram option not valid: "+machine["ram"]+"\nSetting to 512MB"
               machine["ram"]="512MB"
             end
             
