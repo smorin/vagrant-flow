@@ -18,6 +18,7 @@ x = {
    {"name"=>"customvboxurl", "url"=>"demandcube/centos-64_x86_64-VB-4.3.8",},
    {"name"=> "digitaloceancustom", "digitalOceanRegion" => "New York 2", "digitalOceanImage"=>"Debian 7.0 x64"},
    {"name"=> "digitaloceanvboxcustom", "url"=>"demandcube/centos-64_x86_64-VB-4.3.8", "digitalOceanRegion" => "New York 2", "digitalOceanImage"=>"Debian 7.0 x64" },
+   {"name"=> "digitaloceanvboxcustomwithRam", "url"=>"demandcube/centos-64_x86_64-VB-4.3.8", "digitalOceanRegion" => "New York 2", "digitalOceanImage"=>"Debian 7.0 x64", "ram"=>"2GB" },
   ]
 }
 
