@@ -32,8 +32,23 @@ module VagrantPlugins
           machineDefaults = {
             "url"                => "demandcube/centos-65_x86_64-VB-4.3.8",
             "digitalOceanImage"  =>"CentOS 6.5 x64",
-            "digitalOceanRegion" => "San Francisco 1"
+            "digitalOceanRegion" => "San Francisco 1",
+            "ram"                => "512MB",
           }
+          
+          #Valid values for amount of RAM
+          allowedRam = ["512MB","1GB","2GB","4GB","8GB","16GB","32GB","48GB","64GB"]
+          allowedRamConversion = {
+                                  "512MB"=> "512",
+                                  "1GB"  => "1024",
+                                  "2GB"  => "2048",
+                                  "4GB"  => "4096",
+                                  "8GB"  => "8192",
+                                  "16GB" => "16384",
+                                  "32GB" => "32768",
+                                  "48GB" => "49152",
+                                  "64GB" => "65536",
+                                  }
           
           #Default virtualbox__intnet name for private network
           options[:vboxintnet] = "neverwinterDP"
@@ -150,6 +165,16 @@ module VagrantPlugins
                 machine[key] = val
               end
             }
+            
+            #Check if RAM value is valid (Digital Ocean restriction)
+            if not allowedRam.include?(machine["ram"])
+              STDERR.puts "ram option not valid: "+machine["ram"]+"\nSetting to 512MB"
+              machine["ram"]="512MB"
+            end
+            
+            #Vagrant requires the amount of RAM to be written in MB, so do the conversion
+            machine["vagrantram"]= allowedRamConversion[machine["ram"]]
+            
           }
           
           

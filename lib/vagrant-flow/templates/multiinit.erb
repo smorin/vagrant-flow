@@ -30,6 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       provider.api_key = '<%= @digitalOceanApiKey %>'
       provider.region = '<%=machine["digitalOceanRegion"] %>'
       provider.image = '<%= machine["digitalOceanImage"] %>'
+      provider.size = '<%= machine["ram"] %>'
     end
     <% end %>
     
@@ -37,7 +38,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     #VirtualBox provider
     config.vm.provider :virtualbox do |vb|
       vb.name = "<%= machine["name"]%>"
-      # vb.customize ["modifyvm", :id, "--memory", "1024"]
+      vb.customize ["modifyvm", :id, "--memory", "<%= machine["vagrantram"] %>"]
       # vb.customize ["modifyvm", :id, "--cpus", "2"]
     end
     <% end %>
