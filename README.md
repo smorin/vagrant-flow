@@ -150,8 +150,8 @@ Example multiinitconfig.yml file for use with virtualbox and digitalocean provid
 
 #These two keys (digitalOceanApiKey and digitalOceanClientId) must be set for digitalocean to work
 #Omit them if you don't want digitalocean as a provider option in your vagrantfile
-:digitalOceanApiKey: 782a1d830f62e57d985eb7b1c938f94f
-:digitalOceanClientId: ae856c82c79398598838f3f93b7a7d5e
+:digitalOceanApiKey: xxxxxxxxxxxx
+:digitalOceanClientId: yyyyyyyyyyyy
 
 :intnetName: neverwinterDP
 machines:
