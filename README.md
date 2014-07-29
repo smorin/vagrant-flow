@@ -15,7 +15,7 @@ Vagrant-Flow is a [vagrant] (http://www.vagrantup.com/) plugin which allows for 
 echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
 #If you're on OSX
-#This step may no longer be necessary as vagrant-digitalocean may not require it anymore
+#This step may no longer be necessary as vagrant-digitalocean should not require it anymore
 brew install curl-ca-bundle
 
 
