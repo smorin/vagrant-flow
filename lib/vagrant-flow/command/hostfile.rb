@@ -30,7 +30,7 @@ module VagrantPlugins
           options[:nowrite] = false
           options[:quiet] = false
           options[:digitalocean] = false
-          options[:digitalocean_file] = "hostfile_do.yml"
+          options[:digitalocean_file] = "multiinitconfig.yml"
 
           #Parse option, look up OptionParser documentation
           opts = OptionParser.new do |o|
@@ -48,11 +48,11 @@ module VagrantPlugins
               options[:nowrite] = true
             end
             
-            o.on("-d", "--digitalocean", "(Optional) Writes your digital ocean's hostnames and IP addresses to hosts file.  Default file is hostfile_do.yml") do |f|
+            o.on("-d", "--digitalocean", "(Optional) Writes your digital ocean's hostnames and IP addresses to the host files of your machines.  Default file is multiinitconfig.yml") do |f|
               options[:digitalocean] = true
             end
             
-            o.on("-o", "--digitaloceanfile FILE", "(Optional) File to read in for -d option instead of hostfile_do.yml") do |f|
+            o.on("-o", "--digitaloceanfile FILE", "(Optional) File to read in for -d option instead of multiinitconfig.yml") do |f|
               options[:digitalocean_file] = f
             end
           end
@@ -67,7 +67,7 @@ module VagrantPlugins
           if options[:digitalocean]
             config = YAML.load_file(options[:digitalocean_file])
             digitalocean = DigitalOcean_Api.new()
-            hostinfo = digitalocean.getHostNamesAndIps(config[:client_id],config[:api_key])
+            hostinfo = digitalocean.getHostNamesAndIps(config[:digitalOceanToken])
           else
             with_target_vms(argv, :provider => options[:provider]) do |machine|
               return unless machine.communicate.ready?
