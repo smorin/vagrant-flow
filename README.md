@@ -204,7 +204,7 @@ This will look through your vagrantfile config, find all the hostnames and IP's 
 vagrant flow hostfile
 ```
 
-This will make an API call to digital ocean (https://developers.digitalocean.com/droplets/), retrieve your list of hostnames and Ip's, and append that information retrieved from DO to the VM's hosts file specified in your Vagrantfile. The config file it will look for by default is hostfile_do.yml
+This will make an API call to digital ocean (https://developers.digitalocean.com/droplets/), retrieve your list of hostnames and Ip's, and append that information retrieved from DO to the VM's hosts file specified in your Vagrantfile. The config file it will look for by default is the same as the file for multiinit - multiinitconfig.yml
 ```
 vagrant flow hostfile -d
 ```
@@ -227,14 +227,8 @@ If you're already using vagrant flow multiinit, then this configuration is alrea
   end
 ```
 
-Example hostfile_do.yml (For use only with -d option)
-To find your apikey and clientid, log into digital ocean, and visit https://cloud.digitalocean.com/api_access
-```
----
-:api_key: abcdefghijklmnopqrstuvwxyz
-:client_id: zyxwvutsrqponmlkjihgfedcba
-
-```
+Refer to multiinit for how to set your digital ocean token
+To find your digital ocean token, log into digital ocean, and visit https://cloud.digitalocean.com/api_access
 
 * * *
 ## ansibleinventory
