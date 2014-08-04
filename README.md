@@ -142,7 +142,7 @@ machines:
 
 ```
 
-Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.
+Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.  Get your digitalOcean token by logging in and generating a new token under "Apps & API"
 ```
 ---
 #Where your ssh private key lives (for use with digital ocean)
@@ -151,8 +151,7 @@ Example multiinitconfig.yml file for use with virtualbox and digitalocean provid
 
 #These two keys (digitalOceanApiKey and digitalOceanClientId) must be set for digitalocean to work
 #Omit them if you don't want digitalocean as a provider option in your vagrantfile
-:digitalOceanApiKey: 782a1d830f62e57d985eb7b1c938f94f
-:digitalOceanClientId: ae856c82c79398598838f3f93b7a7d5e
+:digitalOceanToken: xxxxxxxxxxxxxxyyyyyyyzzzzz988765445678765
 
 :intnetName: neverwinterDP
 machines:

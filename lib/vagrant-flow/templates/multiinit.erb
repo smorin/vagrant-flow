@@ -8,7 +8,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   Vagrant.require_version ">= 1.4.3"
 
-  
+  <% if @sshPrivateKeyPath %>
+  config.ssh.private_key_path = '<%= @sshPrivateKeyPath %>'
+  <% end %>
 
 <% for machine in @machines %>
 
@@ -21,22 +23,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     <%= machine["name"]%>.vm.network :private_network, ip: "<%= machine["ip"]%>", virtualbox__intnet: "<%= @intnetName %>"
     <%= machine["name"]%>.vm.hostname = "<%= machine["name"]%>"
     
-    <% if machine.has_key?("digitalOceanImage") and machine.has_key?("digitalOceanRegion") and @digitalOceanApiKey and @digitalOceanClientId and @sshPrivateKeyPath %>
-    #digitalOcean provider
     <%= machine["name"]%>.vm.synced_folder  ".", "/vagrant", disabled: true
-    config.vm.provider :digital_ocean do |provider, override|
-      override.ssh.private_key_path = '<%= @sshPrivateKeyPath %>'
-      provider.client_id = '<%= @digitalOceanClientId %>'
-      provider.api_key = '<%= @digitalOceanApiKey %>'
+    
+    <% if machine.has_key?("digitalOceanImage") and machine.has_key?("digitalOceanRegion") and @digitalOceanToken and @sshPrivateKeyPath %>
+    #digitalOcean provider
+    <%= machine["name"]%>.vm.provider :digital_ocean do |provider, override|  
+      provider.token  = '<%= @digitalOceanToken %>'
       provider.region = '<%=machine["digitalOceanRegion"] %>'
-      provider.image = '<%= machine["digitalOceanImage"] %>'
-      provider.size = '<%= machine["ram"] %>'
+      provider.image  = '<%= machine["digitalOceanImage"] %>'
+      provider.size   = '<%= machine["ram"] %>'
     end
     <% end %>
     
     <% if machine.has_key?("name") and machine.has_key?("url")  %>
     #VirtualBox provider
-    config.vm.provider :virtualbox do |vb|
+    <%= machine["name"]%>.vm.provider :virtualbox do |vb|
       vb.name = "<%= machine["name"]%>"
       vb.customize ["modifyvm", :id, "--memory", "<%= machine["vagrantram"] %>"]
       # vb.customize ["modifyvm", :id, "--cpus", "2"]
