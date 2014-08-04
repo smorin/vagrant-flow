@@ -149,9 +149,11 @@ Example multiinitconfig.yml file for use with virtualbox and digitalocean provid
 #~/.ssh/id_rsa is the default, so you can omit this value if you want
 :sshPrivateKeyPath: ~/.ssh/id_rsa
 
-#These two keys (digitalOceanApiKey and digitalOceanClientId) must be set for digitalocean to work
-#Omit them if you don't want digitalocean as a provider option in your vagrantfile
+
+#The digitalOceanToken must be set for digitalocean to work.  You can generate one at https://cloud.digitalocean.com/settings/applications
+#Omit it if you don't want digitalocean as a provider option in your vagrantfile
 :digitalOceanToken: xxxxxxxxxxxxxxyyyyyyyzzzzz988765445678765
+
 
 :intnetName: neverwinterDP
 machines:
