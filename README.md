@@ -15,7 +15,7 @@ Vagrant-Flow is a [vagrant] (http://www.vagrantup.com/) plugin which allows for 
 echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
 #If you're on OSX
-#This step may no longer be required since vagrant-digitalocean should not require it anymore...
+#This step may no longer be necessary as vagrant-digitalocean shouldn't require it anymore
 brew install curl-ca-bundle
 
 
@@ -75,7 +75,6 @@ vagrant ssh boxname2 ping boxname1
 Publically available boxes in vagrantcloud from DemandCube:
 - vagrant init demandcube/centos-64_x86_64-VB-4.3.8
 - vagrant init demandcube/centos-65_x86_64-VB-4.3.8
-- vagrant init demandcube/ubuntu-12_x86_64-VB-4.3.8
 
 
 
@@ -143,17 +142,18 @@ machines:
 
 ```
 
-Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.
+Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.  Get your digitalOcean token by logging in and generating a new token under "Apps & API"
 ```
 ---
 #Where your ssh private key lives (for use with digital ocean)
 #~/.ssh/id_rsa is the default, so you can omit this value if you want
 :sshPrivateKeyPath: ~/.ssh/id_rsa
 
-#These two keys (digitalOceanApiKey and digitalOceanClientId) must be set for digitalocean to work
-#Omit them if you don't want digitalocean as a provider option in your vagrantfile
-:digitalOceanApiKey: xxxxxxxxxxxx
-:digitalOceanClientId: yyyyyyyyyyyy
+
+#The digitalOceanToken must be set for digitalocean to work.  You can generate one at https://cloud.digitalocean.com/settings/applications
+#Omit it if you don't want digitalocean as a provider option in your vagrantfile
+:digitalOceanToken: xxxxxxxxxxxxxxyyyyyyyzzzzz988765445678765
+
 
 :intnetName: neverwinterDP
 machines:
