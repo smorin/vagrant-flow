@@ -8,9 +8,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   Vagrant.require_version ">= 1.4.3"
 
-  <% if @sshPrivateKeyPath %>
-  config.ssh.private_key_path = '<%= @sshPrivateKeyPath %>'
-  <% end %>
 
 <% for machine in @machines %>
 
@@ -27,7 +24,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     <% if machine.has_key?("digitalOceanImage") and machine.has_key?("digitalOceanRegion") and @digitalOceanToken and @sshPrivateKeyPath %>
     #digitalOcean provider
-    <%= machine["name"]%>.vm.provider :digital_ocean do |provider, override|  
+    <%= machine["name"]%>.vm.provider :digital_ocean do |provider, override|
+      override.ssh.private_key_path = '<%= @sshPrivateKeyPath %>'
       provider.token  = '<%= @digitalOceanToken %>'
       provider.region = '<%=machine["digitalOceanRegion"] %>'
       provider.image  = '<%= machine["digitalOceanImage"] %>'
