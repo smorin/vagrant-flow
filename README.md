@@ -169,7 +169,7 @@ machines:
   digitalOceanRegion: nyc2
   digitalOceanImage: Debian 7.0 x64
 #Valid options for digitalOceanRegion:
-#"nyc1, ams1, sfo1, nyc2, ams2, sgp1, lon1
+#nyc1, ams1, sfo1, nyc2, ams2, sgp1, lon1
 #Default is sfo1
 
   #Set custom config for vbox and digitaloceanprovider
