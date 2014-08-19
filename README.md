@@ -166,19 +166,22 @@ machines:
 
   #Set custom config for digitalocean
 - name: digitaloceancustom
-  digitalOceanRegion: New York 2
+  digitalOceanRegion: nyc2
   digitalOceanImage: Debian 7.0 x64
+#Valid options for digitalOceanRegion:
+#"nyc1, ams1, sfo1, nyc2, ams2, sgp1, lon1
+#Default is sfo1
 
   #Set custom config for vbox and digitaloceanprovider
 - name: digitaloceanvboxcustom
   url: demandcube/centos-64_x86_64-VB-4.3.8
-  digitalOceanRegion: New York 2
+  digitalOceanRegion: sgp1
   digitalOceanImage: Debian 7.0 x64
 
   #Set custom config for vbox and digitaloceanprovider and sets amount of RAM
 - name: digitaloceanvboxcustom
   url: demandcube/centos-64_x86_64-VB-4.3.8
-  digitalOceanRegion: New York 2
+  digitalOceanRegion: sfo1
   digitalOceanImage: Debian 7.0 x64
   ram: 2GB
   #Valid options for RAM (This is a digital ocean restriction):
