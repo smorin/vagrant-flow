@@ -32,7 +32,7 @@ module VagrantPlugins
           machineDefaults = {
             "url"                => "demandcube/centos-65_x86_64-VB-4.3.8",
             "digitalOceanImage"  =>"CentOS 6.5 x64",
-            "digitalOceanRegion" => "San Francisco 1",
+            "digitalOceanRegion" => "sfo1",
             "ram"                => "512MB",
           }
           
@@ -49,6 +49,9 @@ module VagrantPlugins
                                   "48GB" => "49152",
                                   "64GB" => "65536",
                                   }
+          
+          #valid values for digitalOceanRegion
+          allowedDORegions = ["nyc1","ams1","sfo1","nyc2","ams2","sgp1","lon1",]
           
           #Default virtualbox__intnet name for private network
           options[:vboxintnet] = "neverwinterDP"
@@ -100,6 +103,7 @@ module VagrantPlugins
               #Load YAML
               content = YAML.load_file(options[:vagrant_cloud_config_file])
             rescue
+              puts $!, $@
               #Give warning if no file could be found
               if not options[:quiet]
                 warn "Could not open file: "+options[:vagrant_cloud_config_file].to_s
@@ -168,12 +172,18 @@ module VagrantPlugins
             
             #Check if RAM value is valid (Digital Ocean restriction)
             if not allowedRam.include?(machine["ram"])
-              STDERR.puts "ram option not valid: "+machine["ram"]+"\nSetting to 512MB"
-              machine["ram"]="512MB"
+              STDERR.puts "ram option not valid: "+machine["ram"]+"\nSetting to "+machineDefaults["ram"]
+              machine["ram"]=machineDefaults["ram"]
             end
             
             #Vagrant requires the amount of RAM to be written in MB, so do the conversion
             machine["vagrantram"]= allowedRamConversion[machine["ram"]]
+            
+            #Make sure the digitalOceanRegion is correct
+            if not allowedDORegions.include?(machine["digitalOceanRegion"])
+              STDERR.puts "digitalOceanRegion option not valid: "+machine["digitalOceanRegion"]+"\nSetting to "+machineDefaults["digitalOceanRegion"]
+              machine["digitalOceanRegion"]=machineDefaults["digitalOceanRegion"]
+            end
             
           }
           
