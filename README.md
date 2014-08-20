@@ -143,6 +143,9 @@ machines:
 ```
 
 Example multiinitconfig.yml file for use with virtualbox and digitalocean providers.  All the extra parameters are required to make digitalocean work.  Get your digitalOcean token by logging in and generating a new token under "Apps & API"
+
+Details on [vagrant-digitalocean](https://github.com/smdahlen/vagrant-digitalocean)
+
 ```
 ---
 #Where your ssh private key lives (for use with digital ocean)
