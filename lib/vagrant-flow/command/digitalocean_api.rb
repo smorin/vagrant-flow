@@ -45,11 +45,8 @@ class DigitalOcean_Api
           ip.push(x["ip_address"])
         end
         
-        #Usually there's only the one IP address per machine,
-        #this will help with backwards compatibility
-        if ip.length == 1
-          ip = ip[0]
-        end
+        #Only use one IP address to avoid confusing etc hosts
+        ip = ip[ip.length-1]
         
         
         returnHash.push({
