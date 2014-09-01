@@ -38,6 +38,7 @@ multiinit
 hostfile
 ansibleinventory
 playbook
+multicommand
 ```
 
 - multiinit
@@ -48,6 +49,8 @@ playbook
   - Create a ansible machine inventory file so that you can use ansible to provision the machines
 - playbook
   - Uses a confile to run ansible-play book to provision one or more VM's
+- multicommand
+  - Runs shell command on multiple machines
 
 Example flow to be enabled
 ```
@@ -65,6 +68,8 @@ vagrant flow ansibleinventory
 vagrant flow playbook
 # or
 ansible-playbook -i ansible-flow_inventoryfile ../DeveloperPlaybooks/site.yml
+
+vagrant flow multicommand -c "/opt/startserver.sh"
 
 #communication test
 vagrant ssh boxname1 ping boxname2
@@ -387,40 +392,29 @@ Example flow-playbook.yml file
 ```
 
 * * *
-
-## Future Usage and Specs
-Looking for vagrant-flow to have the following commands:
-
+##multicommand
 ```
-init-flow
-ansible-inventory
-hostfile-local
-hostfile-remote
-flow
-```
-- init-flow -> creates a stub Vagrant file but takes more options
-- ansible-inventory -> creates a ansible-inventory file from the virtualmachines that are there
-- hostfile-local -> create a hostfile that can be appended to your /etc/hosts locally so you can reference the vm's
-- hostfile-remote -> updates the /etc/hosts on all the vm's created by vagrant so they can talk to each other
-- flow -> calls ansible-inventory and hostfile-remote in 1 command.
+Usage: vagrant flow multicommand [-qf] -c COMMAND
+Runs a shell command on specified machines in your vagrantfile
 
-Example flow to be enabled
-```
-vagrant plugin install vagrant-flow
-git clone http://github.com/DemandCube/DeveloperPlaybooks
-mkdir devsetup
-cd devsetup
-vagrant init-flow frontend1 frontend2:ubuntu-12
-vagrant flow
-ansible-playbook -i ansible-flow_inventoryfile ../DeveloperPlaybooks/site.yml
-
-#communication test
-vagrant ssh frontend1 ping frontend2
-vagrant ssh frontend2 ping frontend1
+    -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
+    -f VMNAME,VNAME2...,             (Optional) comma separated list of machines to run command on
+        --filterMachine
+    -c, --command COMMAND            (REQUIRED) Command to run on the machines
+    -h, --help                       Print this help
 ```
 
+This will run a command on all the machines in your Vagrantfile
+```
+vagrant flow multicommand -c "ls -la"
+```
 
+This will run a command ONLY on machines named flowTest1 and flowTest2
+```
+vagrant flow multicommand -c "ls -la" -f flowTest1,flowTest2
+```
 
+* * *
 
 ## Development Flow
 
@@ -452,6 +446,7 @@ rake release
 # install for real from the repo
 
 vagrant plugin install vagrant-flow
+
 ```
 
 # Background Research

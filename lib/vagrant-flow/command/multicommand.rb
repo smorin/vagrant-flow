@@ -17,7 +17,25 @@ module VagrantPlugins
           "Runs a command on all the machines in your vagrantfile"
         end
 
-
+        def commandThread(machine,command, quiet)
+          begin
+            machine.communicate.execute(command)
+            if !quiet
+              puts "Command was ran successfully on: "+machine.config.vm.hostname
+            end
+          rescue
+            if !quiet
+              puts "Command FAILED on: "+machine.config.vm.hostname
+              @error_message="#{$!}"
+              puts @error_message
+            end
+          ensure
+            if !quiet
+              puts "----"
+            end
+          end
+        end
+        
         # Builtin from Command class
         # Must override to provide core functionality
         def execute
@@ -25,38 +43,44 @@ module VagrantPlugins
           options[:destroy_on_error] = true
           options[:parallel] = false
           options[:provision_ignore_sentinel] = false
-          options[:nowrite] = false
           options[:quiet] = false
-          options[:digitalocean] = false
-          options[:digitalocean_file] = "multiinitconfig.yml"
+          options[:filter] = []
 
-          #Parse option, look up OptionParser documentation
           opts = OptionParser.new do |o|
-            # o.banner = "Usage: vagrant ansible-inventory [vm-name] [options] [-h]"
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow multicommand [-qdf]\n"+
-                        "Runs a shell command on all the machines in your vagrantfile"
+                        "Usage: vagrant flow multicommand [-qf] -c COMMAND\n"+
+                        "Runs a shell command on specified machines in your vagrantfile"
             o.separator ""
 
             o.on("-q", "--quiet", "(Optional) Suppress output to STDOUT and STDERR") do |f|
               options[:quiet] = true
             end
             
-            o.on("-d", "--digitalocean", "(Optional) Use this option to communicate with digital ocean machines.  Default file is multiinitconfig.yml") do |f|
-              options[:digitalocean] = true
+            o.on("-f", "--filterMachine VMNAME,VNAME2...", Array, "(Optional) comma separated list of machines to run command on") do |f|
+              options[:filter] = f
             end
             
-            o.on("-f", "--multiinitconfig FILE", "(Optional) File to read in for config instead of multiinitconfig.yml") do |f|
-              options[:digitalocean_file] = f
+            o.on("-c", "--command COMMAND", "(REQUIRED) Command to run on the machines") do |f|
+              options[:command] = f
             end
           end
           argv = parse_options(opts)
           return if !argv
+          raise OptionParser::MissingArgument if options[:command].nil?
           
-
+          threads = []
+          
           with_target_vms(argv, :provider => options[:provider]) do |machine|
-            return unless machine.communicate.ready?
+            #return unless machine.communicate.ready?
+            if options[:filter].empty? or options[:filter].include? machine.config.vm.hostname
+              threads.push(Thread.new{commandThread(machine,options[:command],options[:quiet])})
+            end
           end
+          
+          threads.each {|t|
+            t.join
+          }
+          
         end
       end
     end
