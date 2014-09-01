@@ -33,7 +33,11 @@ module VagrantPlugins
             require_relative "playbook"
             Playbook
           end
-
+          
+          @subcommands.register(:multicommand) do
+            require_relative "multicommand"
+            MultiCommand
+          end
         end
 
         def execute
