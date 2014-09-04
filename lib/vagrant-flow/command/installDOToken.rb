@@ -6,7 +6,7 @@ require 'yaml'
 module VagrantPlugins
   module CommandVagrantFlow
     module Command
-      class InstallDOKey < Vagrant.plugin("2", :command)
+      class InstallDOToken < Vagrant.plugin("2", :command)
         
         # Builtin from Command class
         # Must override to provide a description

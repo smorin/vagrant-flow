@@ -39,9 +39,9 @@ module VagrantPlugins
             MultiCommand
           end
 
-          @subcommands.register(:installdokey) do
-            require_relative "installdokey"
-            InstallDOKey
+          @subcommands.register(:installdotoken) do
+            require_relative "installdotoken"
+            InstallDOToken
           end
           
         end
