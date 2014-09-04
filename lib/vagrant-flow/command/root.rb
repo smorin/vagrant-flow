@@ -38,6 +38,12 @@ module VagrantPlugins
             require_relative "multicommand"
             MultiCommand
           end
+
+          @subcommands.register(:installdotoken) do
+            require_relative "installdotoken"
+            InstallDOToken
+          end
+          
         end
 
         def execute

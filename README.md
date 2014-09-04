@@ -40,7 +40,8 @@ ansibleinventory
 playbook
 multicommand
 ```
-
+- installdotoken
+  - Installs your digital ocean token to be able to use the digital ocean provider
 - multiinit
   - Creates a template Vagrantfile based on the machines you specify
 - hostfile
@@ -55,6 +56,7 @@ multicommand
 Example flow to be enabled
 ```
 vagrant plugin install vagrant-flow
+vagrant flow installdotoken -t xxxxxyyyyyyzzzz123
 git clone http://github.com/DemandCube/DeveloperPlaybooks
 mkdir devsetup
 cd devsetup
@@ -85,6 +87,19 @@ Publically available boxes in vagrantcloud from DemandCube:
 
 # Usage
 
+* * *
+##installdotoken
+Usage: vagrant flow multicommand [-qf] -c COMMAND
+Installs your digital ocean key for easy vagrant-flow configuration
+
+    -q, --quiet                      (Optional) Suppress output to STDOUT and STDERR
+    -t, --token TOKEN                (REQUIRED) The token to install
+    -h, --help                       Print this help
+
+Example:  This will isntall your token to ~/.vagrant-flow for use in other plugins
+```
+vagrant flow installdotoken -t abcddefjdaj1243
+```
 
 * * *
 ## multiinit
@@ -158,11 +173,6 @@ Details on [vagrant-digitalocean](https://github.com/smdahlen/vagrant-digitaloce
 :sshPrivateKeyPath: ~/.ssh/id_rsa
 
 
-#The digitalOceanToken must be set for digitalocean to work.  You can generate one at https://cloud.digitalocean.com/settings/applications
-#Omit it if you don't want digitalocean as a provider option in your vagrantfile
-:digitalOceanToken: xxxxxxxxxxxxxxyyyyyyyzzzzz988765445678765
-
-
 :intnetName: neverwinterDP
 machines:
   #Create a box with all defaults set for you
@@ -215,31 +225,11 @@ This will look through your vagrantfile config, find all the hostnames and IP's 
 vagrant flow hostfile
 ```
 
-This will make an API call to digital ocean (https://developers.digitalocean.com/droplets/), retrieve your list of hostnames and Ip's, and append that information retrieved from DO to the VM's hosts file specified in your Vagrantfile. The config file it will look for by default is the same as the file for multiinit - multiinitconfig.yml
+This will make an API call to digital ocean (https://developers.digitalocean.com/droplets/), retrieve your list of hostnames and Ip's, and append that information retrieved from DO to the VM's hosts file specified in your Vagrantfile.
+This option requires you first run vagrant flow installdotoken -t [your token here]
 ```
 vagrant flow hostfile -d
 ```
-
-Example Vagrantfile excerpt.  This configuration is required by hostfile to be able to determine IP addresses and hostnames.
-If you're already using vagrant flow multiinit, then this configuration is already take care of
-```
-  config.vm.define :server1 do | server1 |
-    server1.vm.box = "demandcube/centos-65_x86_64-VB-4.3.8"
-    # Create a private network
-    server1.vm.network :private_network, ip: "192.168.1.2", virtualbox__intnet: "neverwinterDP"
-    server1.vm.hostname = "server1"
-  end
-
-  config.vm.define :server2 do | server2 |
-    server2.vm.box = "demandcube/centos-65_x86_64-VB-4.3.8"
-    # Create a private network
-    server2.vm.network :private_network, ip: "192.168.1.3", virtualbox__intnet: "neverwinterDP"
-    server2.vm.hostname = "server2"
-  end
-```
-
-Refer to multiinit for how to set your digital ocean token
-To find your digital ocean token, log into digital ocean, and visit https://cloud.digitalocean.com/api_access
 
 * * *
 ## ansibleinventory
