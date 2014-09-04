@@ -6,6 +6,9 @@ require 'yaml'
 #Require my library for talking to digitalocean
 require File.expand_path(File.dirname(__FILE__) ) +"/digitalocean_api"
 
+#Require my library for grabbing installed DO Token
+require File.expand_path(File.dirname(__FILE__) ) +"/getDOToken"
+
 module VagrantPlugins
   module CommandVagrantFlow
     module Command
@@ -30,7 +33,6 @@ module VagrantPlugins
           options[:nowrite] = false
           options[:quiet] = false
           options[:digitalocean] = false
-          options[:digitalocean_file] = "multiinitconfig.yml"
 
           #Parse option, look up OptionParser documentation
           opts = OptionParser.new do |o|
@@ -52,9 +54,6 @@ module VagrantPlugins
               options[:digitalocean] = true
             end
             
-            o.on("-o", "--digitaloceanfile FILE", "(Optional) File to read in for -d option instead of multiinitconfig.yml") do |f|
-              options[:digitalocean_file] = f
-            end
           end
           argv = parse_options(opts)
           return if !argv
@@ -65,9 +64,8 @@ module VagrantPlugins
           #Go through config
           #Map hostnames to IP's
           if options[:digitalocean]
-            config = YAML.load_file(options[:digitalocean_file])
             digitalocean = DigitalOcean_Api.new()
-            hostinfo = digitalocean.getHostNamesAndIps(config[:digitalOceanToken])
+            hostinfo = digitalocean.getHostNamesAndIps(GetDOToken.getToken())
           else
             with_target_vms(argv, :provider => options[:provider]) do |machine|
               return unless machine.communicate.ready?

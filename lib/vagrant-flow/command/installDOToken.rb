@@ -45,7 +45,7 @@ module VagrantPlugins
 
           opts = OptionParser.new do |o|
             o.banner = "A NeverWinterDP technology from the Department of Badass.\n\n"+
-                        "Usage: vagrant flow multicommand [-qf] -c COMMAND\n"+
+                        "Usage: vagrant flow multicommand [-q] -t TOKEN\n"+
                         "Installs your digital ocean key for easy vagrant-flow configuration"
             o.separator ""
 
@@ -68,16 +68,17 @@ module VagrantPlugins
           filename = ENV['HOME']+"/.vagrant-flow"
           begin
             File.open(filename, 'w') { |file| file.write (x.to_yaml ) }
+            if !options[:quiet]
+              puts "Success!"
+            end
           rescue
-            @error_message="#{$!}"
-            $stderr.puts "Could not write to "+filename
-            $stderr.puts @error_message
+            if !options[:quiet]
+              @error_message="#{$!}"
+              $stderr.puts "Could not write to "+filename
+              $stderr.puts @error_message
+            end
           end
           
-          
-          #Require my library for talking to digitalocean
-          require File.expand_path(File.dirname(__FILE__) ) +"/getDOKey"
-          puts getKey()
           
         end
       end

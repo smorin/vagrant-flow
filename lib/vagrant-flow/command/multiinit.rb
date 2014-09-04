@@ -4,6 +4,9 @@ require "yaml"
 require 'erubis'
 require "ipaddr"
 
+#Require my library for grabbing installed DO Token
+require File.expand_path(File.dirname(__FILE__) ) +"/getDOToken"
+
 module VagrantPlugins
   module CommandVagrantFlow
     module Command
@@ -136,6 +139,12 @@ module VagrantPlugins
           #Bail out here if content is fubar
           if not content.has_key?("machines")
             return
+          end
+          
+          #Set digitalocean token if its installed
+          token= GetDOToken.getToken()
+          if ! token.nil?
+            content[:digitalOceanToken] = token
           end
           
           #Set IP's for private network
