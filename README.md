@@ -34,6 +34,7 @@ See the [NeverwinterDP Guide to Contributing] (https://github.com/DemandCube/Nev
 vagrant-flow has 1 command `flow` and the following subcommands:
 
 ```
+installdotoken
 multiinit
 hostfile
 ansibleinventory
