@@ -38,6 +38,12 @@ module VagrantPlugins
             require_relative "multicommand"
             MultiCommand
           end
+
+          @subcommands.register(:installdokey) do
+            require_relative "installdokey"
+            InstallDOKey
+          end
+          
         end
 
         def execute

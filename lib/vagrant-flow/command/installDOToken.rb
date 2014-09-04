@@ -1,10 +1,7 @@
 require "vagrant"
 require 'optparse'
-require 'tempfile'
 require 'yaml'
 
-#Require my library for talking to digitalocean
-require File.expand_path(File.dirname(__FILE__) ) +"/digitalocean_api"
 
 module VagrantPlugins
   module CommandVagrantFlow
@@ -56,25 +53,35 @@ module VagrantPlugins
               options[:quiet] = true
             end
             
-            
             o.on("-t", "--token TOKEN", "(REQUIRED) The token to install") do |f|
               options[:token] = f
             end
           end
+          
           argv = parse_options(opts)
           return if !argv
           raise OptionParser::MissingArgument if options[:token].nil?
           x = {
             :digitalOceanToken=>options[:token],
-            }
+          }
+          
+          filename = ENV['HOME']+"/.vagrant-flow"
           begin
-            File.open('~/.vagrant-flow', 'w') { |file| f.write x.to_yaml  }
+            File.open(filename, 'w') { |file| file.write (x.to_yaml ) }
           rescue
-            $stderr.print "Writing to ~/.vagrant-flow failed: " + $!
+            @error_message="#{$!}"
+            $stderr.puts "Could not write to "+filename
+            $stderr.puts @error_message
           end
+          
+          
+          #Require my library for talking to digitalocean
+          require File.expand_path(File.dirname(__FILE__) ) +"/getDOKey"
+          puts getKey()
           
         end
       end
     end
   end
 end
+
