@@ -21,6 +21,7 @@ brew install curl-ca-bundle
 
 vagrant plugin install vagrant-digitalocean
 vagrant plugin install vagrant-flow
+vagrant flow installdotoken [your digital ocean token]
 ```
 
 ## Contributing
